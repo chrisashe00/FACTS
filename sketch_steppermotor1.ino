@@ -45,10 +45,10 @@ void loop() {
   // put your main code here, to run repeatedly:
 
 
-  digitalWrite (ledPin, HIGH);  // turn on the LED
-  delay(500); // wait for half a second or 500 milliseconds
-  digitalWrite (ledPin, LOW); // turn off the LED
-  delay(500); // wait for half a second or 500 milliseconds
+  //digitalWrite (ledPin, HIGH);  // turn on the LED
+  //delay(500); // wait for half a second or 500 milliseconds
+  //digitalWrite (ledPin, LOW); // turn off the LED
+  //delay(500); // wait for half a second or 500 milliseconds
   
   for (int i=0; i<3199; i++)
   {
@@ -57,8 +57,9 @@ void loop() {
     }
 
     delay(3000);
-    for (int i=0; i<1599; i--)
-    {
+    for (int i=0; i<1599; i++)
+    { 
+      stepnumber--;
       move(stepnumber,255,1000);
       }
     delay(3000);
