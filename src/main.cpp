@@ -56,28 +56,6 @@ void setup() {
   Serial.begin(115200);
 
 }
-
-void loop() {
-  //digitalWrite (ledPin, HIGH);  // turn on the LED
-  //delay(500); // wait for half a second or 500 milliseconds
-  //digitalWrite (ledPin, LOW); // turn off the LED
-  //delay(500); // wait for half a second or 500 milliseconds
-  
-  for (int i=0; i<3199; i++)
-  {
-    stepnumber++;
-    move(stepnumber,255,250);
-    }
-
-    delay(3000);
-    for (int i=0; i<1599; i++)
-    { 
-      stepnumber--;
-      move(stepnumber,255,1000);
-      }
-    delay(3000);
-} 
-
 void move(int stepnumber, int MAXpower, int wait) {
   time_now = millis();
   
@@ -110,3 +88,26 @@ void move(int stepnumber, int MAXpower, int wait) {
 
     
   }
+
+
+void loop() {
+  //digitalWrite (ledPin, HIGH);  // turn on the LED
+  //delay(500); // wait for half a second or 500 milliseconds
+  //digitalWrite (ledPin, LOW); // turn off the LED
+  //delay(500); // wait for half a second or 500 milliseconds
+  
+  for (int i=0; i<3199; i++)
+  {
+    stepnumber++;
+    move(stepnumber,255,250);
+    }
+
+    delay(3000);
+    for (int i=0; i<1599; i++)
+    { 
+      stepnumber--;
+      move(stepnumber,255,1000);
+      }
+    delay(3000);
+} 
+
