@@ -87,7 +87,7 @@ void move_routine(void *parameters) {
     move(stepnumber,255,250);
     }
 
-    delay(3000);
+    vTaskDelay(3000/portTICK_PERIOD_MS);
     for (int i=0; i<1599; i++)
     { 
       stepnumber--;
