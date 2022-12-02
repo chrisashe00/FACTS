@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Stepper.h>
 
 /*================PIN DEFINITIONS================*/
 #define LEDC_CHANNEL_0  0
@@ -12,102 +13,63 @@ const int B1A = 26;
 const int B2A = 25;
 const int ledPin = 33;
 
-/*================VARIABLE DEFINITIONS================*/
-int stepnumber = 0;
-int Pa; int Pb;
-unsigned long last_time = millis(); 
-unsigned int time_now;
+const int stepsPerRev = 200;
+
+Stepper myStepper(stepsPerRev, 14,27,26,25);
 
 
+void task1(void * parameters){
+      for(;;){
+          Serial.println("clockwise");
+          myStepper.step(stepsPerRev);
+          vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-/*================LEDC DUTY CYCLE SETUP================*/
-#define LEDC_TIMER_12_BIT 12
-#define LEDC_BASE_FREQ  5000
+          // step one revolution in the other direction:
+          Serial.println("counterclockwise");
+          myStepper.step(-stepsPerRev);
+          vTaskDelay(1000 / portTICK_PERIOD_MS);
+      }
 
-
-/*================Function Definitions================*/
-//Analogwrite using LEDC capabilities
-  void ledcAnalogWrite(uint8_t channel, uint32_t value, uint32_t valueMax = 255) {
-    uint32_t duty = (4095/valueMax)*min(value, valueMax); 
-
-    ledcWrite(channel,duty);
-  }
-
-//delaying function
-void update_delay(){
-  last_time = millis();
 }
-  
-  
 
+void task2(void * parametrs){
+  digitalWrite(ledPin, HIGH); 
+  vTaskDelay(500/portTICK_PERIOD_MS); 
+  digitalWrite(ledPin, LOW); 
+  vTaskDelay(500/portTICK_PERIOD_MS);
+}
 
-void setup() {
- pinMode (ledPin, OUTPUT);
-
- ledcSetup(LEDC_CHANNEL_0, LEDC_BASE_FREQ, LEDC_TIMER_12_BIT); 
- ledcSetup(LEDC_CHANNEL_1, LEDC_BASE_FREQ, LEDC_TIMER_12_BIT);
- ledcSetup(LEDC_CHANNEL_2, LEDC_BASE_FREQ, LEDC_TIMER_12_BIT);
- ledcSetup(LEDC_CHANNEL_3, LEDC_BASE_FREQ, LEDC_TIMER_12_BIT);
-
- ledcAttachPin(A1A,LEDC_CHANNEL_0);
- ledcAttachPin(A1B,LEDC_CHANNEL_1);
- ledcAttachPin(B1A,LEDC_CHANNEL_2);
- ledcAttachPin(B2A,LEDC_CHANNEL_3);
+void setup(){
+  myStepper.setSpeed(60);
+  pinMode(ledPin, OUTPUT);
   Serial.begin(115200);
 
+
+
+
+xTaskCreate(
+    task1, 
+    "Task 1",
+    1000,
+    NULL,
+    1,
+    NULL
+  );
+
+  xTaskCreate(
+    task2, 
+    "Task 2", 
+    1024, 
+    NULL, 
+    1, 
+    NULL
+  );
+
+
 }
-void move(int stepnumber, int MAXpower, int wait) {
-  time_now = millis();
-  
-    Pa = (sin(stepnumber*0.098174)*MAXpower);
-    Pb = (cos(stepnumber*0.098174)*MAXpower);
 
-    if (Pa>0)
-    { 
-      ledcAnalogWrite(LEDC_CHANNEL_0,Pa);
-      ledcAnalogWrite(LEDC_CHANNEL_1,0);
-    }
-    else
-    {
-      ledcAnalogWrite(LEDC_CHANNEL_0,0);
-      ledcAnalogWrite(LEDC_CHANNEL_1,abs(Pa));
-    }
-    
-    if (Pb>0)
-    {
-      ledcAnalogWrite(LEDC_CHANNEL_2,Pb);
-      ledcAnalogWrite(LEDC_CHANNEL_3,0);
-    }
+void loop(){
 
-    else
-    {
-      ledcAnalogWrite(LEDC_CHANNEL_2,0);
-      ledcAnalogWrite(LEDC_CHANNEL_3,abs(Pb));
-    }
+}
 
-
-    
-  }
-
-
-void loop() {
-  //digitalWrite (ledPin, HIGH);  // turn on the LED
-  //delay(500); // wait for half a second or 500 milliseconds
-  //digitalWrite (ledPin, LOW); // turn off the LED
-  //delay(500); // wait for half a second or 500 milliseconds
-  
-  for (int i=0; i<3199; i++)
-  {
-    stepnumber++;
-    move(stepnumber,255,250);
-    }
-
-    delay(3000);
-    for (int i=0; i<1599; i++)
-    { 
-      stepnumber--;
-      move(stepnumber,255,1000);
-      }
-    delay(3000);
-} 
 
