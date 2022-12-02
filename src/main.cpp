@@ -32,7 +32,7 @@ void motor_task(void * parameters){
 
 }
 
-void led_task(void * parametrs){
+void led_task(void * parameeters){
   while(1){
     digitalWrite(ledPin, HIGH); 
     vTaskDelay(500/portTICK_PERIOD_MS); 
