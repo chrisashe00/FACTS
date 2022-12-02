@@ -1,5 +1,11 @@
 #include <Arduino.h>
 
+#if CONFIG_FREERTOS_UNICORE
+  static const BaseType_t app_cpu = 0;
+#else
+  static const BaseType_t app_cpu = 1;
+#endif
+
 /*================PIN DEFINITIONS================*/
 #define LEDC_CHANNEL_0  0
 #define LEDC_CHANNEL_1  1
@@ -98,11 +104,12 @@ void move_routine(void *parameters) {
 }
 
 void led_flash(void *parameters) {
-
-  digitalWrite (ledPin, HIGH);  // turn on the LED
-  delay(500); // wait for half a second or 500 milliseconds
-  digitalWrite (ledPin, LOW); // turn off the LED
-  delay(500); // wait for half a second or 500 milliseconds
+  while(1){
+    digitalWrite (ledPin, HIGH);  // turn on the LED
+    vTaskDelay(500/ portTICK_PERIOD_MS);
+    digitalWrite (ledPin, LOW); // turn off the LED
+    vTaskDelay(500/ portTICK_PERIOD_MS);
+  }
 }
 
 void setup() {
@@ -117,18 +124,18 @@ void setup() {
   ledcAttachPin(A1B,LEDC_CHANNEL_1);
   ledcAttachPin(B1A,LEDC_CHANNEL_2);
   ledcAttachPin(B2A,LEDC_CHANNEL_3);
-    Serial.begin(115200);
+  //  Serial.begin(115200);
 
   //pinning move_routine function to core
-  xTaskCreatePinnedToCore(
-    move_routine, 
-    "move routine", 
-    2048, 
-    NULL, 
-    1, 
-    NULL, 
-    APP_CPU_NUM
-  );
+  // xTaskCreatePinnedToCore(
+  //   move_routine, 
+  //   "move routine", 
+  //   2048, 
+  //   NULL, 
+  //   1, 
+  //   NULL, 
+  //   APP_CPU_NUM
+  // );
 
   //pinning led_flash function to core 
   xTaskCreatePinnedToCore(
@@ -138,7 +145,7 @@ void setup() {
     NULL, 
     1, 
     NULL, 
-    APP_CPU_NUM
+    1 
   );
 
   //Delete "setup and loop" task 
