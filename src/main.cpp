@@ -18,7 +18,7 @@ const int stepsPerRev = 200;
 Stepper myStepper(stepsPerRev, 14,27,26,25);
 
 
-void task1(void * parameters){
+void motor_task(void * parameters){
       for(;;){
           Serial.println("clockwise");
           myStepper.step(stepsPerRev);
@@ -32,7 +32,7 @@ void task1(void * parameters){
 
 }
 
-void task2(void * parametrs){
+void led_task(void * parametrs){
   while(1){
     digitalWrite(ledPin, HIGH); 
     vTaskDelay(500/portTICK_PERIOD_MS); 
@@ -48,8 +48,8 @@ void setup(){
 
 
   xTaskCreatePinnedToCore(
-    task1, 
-    "Task 1",
+    motor_task, 
+    "Motor Task",
     1024,
     NULL,
     1,
@@ -59,8 +59,8 @@ void setup(){
 
 
   xTaskCreatePinnedToCore(
-    task2, 
-    "Task 2", 
+    led_task, 
+    "LED Task", 
     1024, 
     NULL, 
     1, 
