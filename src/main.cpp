@@ -33,10 +33,12 @@ void task1(void * parameters){
 }
 
 void task2(void * parametrs){
-  digitalWrite(ledPin, HIGH); 
-  vTaskDelay(500/portTICK_PERIOD_MS); 
-  digitalWrite(ledPin, LOW); 
-  vTaskDelay(500/portTICK_PERIOD_MS);
+  while(1){
+    digitalWrite(ledPin, HIGH); 
+    vTaskDelay(500/portTICK_PERIOD_MS); 
+    digitalWrite(ledPin, LOW); 
+    vTaskDelay(500/portTICK_PERIOD_MS);
+  }
 }
 
 void setup(){
@@ -45,24 +47,25 @@ void setup(){
   Serial.begin(115200);
 
 
-
-
-xTaskCreate(
+  xTaskCreatePinnedToCore(
     task1, 
     "Task 1",
-    1000,
+    1024,
     NULL,
     1,
-    NULL
+    NULL,
+    1
   );
 
-  xTaskCreate(
+
+  xTaskCreatePinnedToCore(
     task2, 
     "Task 2", 
     1024, 
     NULL, 
     1, 
-    NULL
+    NULL, 
+    1
   );
 
 
