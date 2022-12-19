@@ -18,7 +18,7 @@ int stepnumber = 0;
 int Pa; int Pb;
 
 /*================LEDC DUTY CYCLE SETUP================*/
-#define LEDC_TIMER_12_BIT 12
+#define LEDC_TIMER_12_BIT 8
 #define LEDC_BASE_FREQ  5000
 
 /*================Struct Definitions================*/
@@ -36,56 +36,56 @@ typedef struct {
   int wait; 
 } move_params;
 
+
 /*================Function Definitions================*/
 //Analogwrite using LEDC capabilities
-  void ledcAnalogWrite(uint8_t channel, uint32_t value, uint32_t valueMax = 255) {
+void ledcAnalogWrite(uint8_t channel, uint32_t value, uint32_t valueMax = 255) {
     //casting the input struct from void back to correct struct
     //ledc_aw_params ledc_param = *(ledc_aw_params *) data;
 
     //calculation of duty cycle
-    //uint32_t duty = (4095/ledc_param.valueMax)*min(ledc_param.value, ledc_param.valueMax); 
     uint32_t duty = (4095/valueMax)*min(value, valueMax); 
     ledcWrite(channel,duty);
   }
 
-  
-  
+/*================ micro-step move sub routine function================*/
 void move(int stepnumber, int MAXpower, int wait) {
     //move_params instruction = *(move_params *) instructions;
 
-    Pa = (sin(stepnumber*0.098174)*MAXpower);
+    Pa = (sin(stepnumber*0.098174)*MAXpower); //0.098174 for 1/16th micro-stepping
     Pb = (cos(stepnumber*0.098174)*MAXpower);
 
-    if (Pa>0)
+    if (Pa>0) //if Pa a is high analog write power to channel 0 (positive for A phase)
     { 
       ledcAnalogWrite(LEDC_CHANNEL_0,Pa);
       ledcAnalogWrite(LEDC_CHANNEL_1,0);
     }
     else
     {
-      ledcAnalogWrite(LEDC_CHANNEL_0,0);
-      ledcAnalogWrite(LEDC_CHANNEL_1,abs(Pa));
+      ledcAnalogWrite(LEDC_CHANNEL_0,0); 
+      ledcAnalogWrite(LEDC_CHANNEL_1,abs(Pa)); // else write to channel 1, (negative for A phase)
     }
     
     if (Pb>0)
     {
-      ledcAnalogWrite(LEDC_CHANNEL_2,Pb);
+      ledcAnalogWrite(LEDC_CHANNEL_2,Pb); //if Pb is high analog write power to channel to 2 (positive for B phase)
       ledcAnalogWrite(LEDC_CHANNEL_3,0);
     }
 
     else
     {
       ledcAnalogWrite(LEDC_CHANNEL_2,0);
-      ledcAnalogWrite(LEDC_CHANNEL_3,abs(Pb));
+      ledcAnalogWrite(LEDC_CHANNEL_3,abs(Pb)); // else write to channel 3 (negative for B phase)
     }
 }
 
+/*================micro-step loop (RTOS)================*/
 void move_routine(void *parameters) {
 
   for (int i=0; i<3199; i++)
   {
     stepnumber++;
-    move(stepnumber,255,250);
+    move(stepnumber,255,250); //255 full PWM power
     }
 
     vTaskDelay(3000/portTICK_PERIOD_MS);
@@ -98,6 +98,7 @@ void move_routine(void *parameters) {
     vTaskDelay(3000/portTICK_PERIOD_MS);
 }
 
+/*================Flash Function================*/
 void led_flash(void *parameters) {
 
   digitalWrite (ledPin, HIGH);  // turn on the LED
@@ -106,9 +107,11 @@ void led_flash(void *parameters) {
   delay(500); // wait for half a second or 500 milliseconds
 }
 
+/*================RTOS setup function================*/
 void setup() {
  pinMode (ledPin, OUTPUT);
 
+  //channels, frequencies, memory assigned to pins 
   ledcSetup(LEDC_CHANNEL_0, LEDC_BASE_FREQ, LEDC_TIMER_12_BIT); 
   ledcSetup(LEDC_CHANNEL_1, LEDC_BASE_FREQ, LEDC_TIMER_12_BIT);
   ledcSetup(LEDC_CHANNEL_2, LEDC_BASE_FREQ, LEDC_TIMER_12_BIT);
@@ -118,7 +121,8 @@ void setup() {
   ledcAttachPin(A1B,LEDC_CHANNEL_1);
   ledcAttachPin(B1A,LEDC_CHANNEL_2);
   ledcAttachPin(B2A,LEDC_CHANNEL_3);
-    Serial.begin(115200);
+  
+  Serial.begin(115200);
 
   //pinning move_routine function to core
   xTaskCreatePinnedToCore(
@@ -146,6 +150,7 @@ void setup() {
   vTaskDelete(NULL);
 }
 
+/*================void loop (not used)================*/
 void loop() {
   
 } 
