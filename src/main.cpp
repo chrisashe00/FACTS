@@ -1,7 +1,6 @@
 #include <Arduino.h>
 
 /*================PIN DEFINITIONS================*/
-
 #define LEDC_CHANNEL_0  0
 #define LEDC_CHANNEL_1  1
 #define LEDC_CHANNEL_2  2
