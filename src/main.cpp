@@ -1,17 +1,23 @@
 #include <Arduino.h>
+#include <Stepper.h>
 
-const byte led_gpio = 32;
+const int step_360 = 200; // 360 number of steps per/rev
+// initialize the stepper library on pins 2-5 n 8-11
+Stepper myStepper1(step_360,14,27,26,25);
+Stepper myStepper2(step_360,5,18,19,21);
 
-// the setup function runs once when you press reset or power the board
-void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
-  pinMode(led_gpio, OUTPUT);
+void setup()
+{
+// set the speed at 60 rpm:
+myStepper1.setSpeed(60);//left
+myStepper2.setSpeed(60);//right
+// initialize the serial port:
+Serial.begin(115200);
 }
-
-// the loop function runs over and over again forever
-void loop() {
-  digitalWrite(led_gpio, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(1000);                       // wait for a second
-  digitalWrite(led_gpio, LOW);    // turn the LED off by making the voltage LOW
-  delay(1000);                       // wait for a second
+void loop()
+{
+// step one revolution in one direction:
+Serial.println("clockwise");
+myStepper1.step(step_360);
+delay(500);
 }
