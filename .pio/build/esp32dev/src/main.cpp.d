@@ -127,5 +127,4 @@
  C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/spi_flash/include/esp_spi_flash.h \
  C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/spi_flash/include/esp_spi_flash_counters.h \
  C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_hw_support/include/soc/esp32/spiram.h \
- .pio/libdeps/esp32dev/Stepper/src/Stepper.h \
- .pio/libdeps/esp32dev/AccelStepper/src/AccelStepper.h
+ .pio/libdeps/esp32dev/Stepper/src/Stepper.h

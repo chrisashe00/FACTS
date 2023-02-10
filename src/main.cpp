@@ -1,26 +1,30 @@
 #include <Arduino.h>
 #include <Stepper.h>
-#include <AccelStepper.h>
 
-// Steps per revolution for NEMA 11
-const int STEPS_PER_REV = 200;
+const int stepsPerRevolution = 200; // change this to match the number of steps per revolution for your motor
 
-//Defining Motor Pins and number of wires required 
+Stepper myStepper(stepsPerRevolution, 14, 27, 26, 25); // initialize the stepper library with the number of steps per revolution and the pin numbers
 
-#define A1A 13
-#define A1B 12
-#define B1A 14
-#define B1B 27
-
-// number of motor wires 
-#define MOTORWIRES 4
-
-AccelStepper zStage(MOTORWIRES , A1A , A1B, B1A, B1B)
-
-void setup(){
-
+void setup()
+{
+    Serial.begin(115200); // initialize serial communication
+    myStepper.setSpeed(60); // set the speed of the motor
 }
 
-void loop(){
-    
+void loop()
+{
+    if (Serial.available())
+    {
+        char received = Serial.read();
+        if (received == 'a')
+        {
+            Serial.println("Stepper motor rotating counterclockwise");
+            myStepper.step(-stepsPerRevolution / 4); // rotate the stepper motor by a quarter turn in the counterclockwise direction
+        }
+        else if (received == 'd')
+        {
+            Serial.println("Stepper motor rotating clockwise");
+            myStepper.step(stepsPerRevolution / 4); // rotate the stepper motor by a quarter turn in the clockwise direction
+        }
+    }
 }
