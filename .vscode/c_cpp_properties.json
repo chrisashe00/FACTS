@@ -199,7 +199,10 @@
                 "C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/cores/esp32",
                 "C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/variants/esp32",
                 "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/libdeps/esp32dev/PS3 Controller Host/src",
+<<<<<<< HEAD
                 "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/libdeps/esp32dev/Stepper/src",
+=======
+>>>>>>> AccelStepper
                 "C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/libraries/ArduinoOTA/src",
                 "C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/libraries/AsyncUDP/src",
                 "C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/libraries/BLE/src",
@@ -428,7 +431,10 @@
                     "C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/cores/esp32",
                     "C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/variants/esp32",
                     "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/libdeps/esp32dev/PS3 Controller Host/src",
+<<<<<<< HEAD
                     "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/libdeps/esp32dev/Stepper/src",
+=======
+>>>>>>> AccelStepper
                     "C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/libraries/ArduinoOTA/src",
                     "C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/libraries/AsyncUDP/src",
                     "C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/libraries/BLE/src",
