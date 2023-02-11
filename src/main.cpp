@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <Stepper.h>
 
-
 const int stepsPerRevolution = 200; // change this to match the number of steps per revolution for your motor
 const float stepAngle = 1.8; // NEMA 11 step angle in degrees
 const float stepRad = stepAngle * (3.141 / 180); // step angle in radians 
@@ -15,7 +14,6 @@ float Revs = 4; //Enter number of revs here
 float linDisp = 4 * stepsPerRevolution * 0.0314 * 2.5; //Rotational to Linear Displacement
 
 int count1 = 0;
-
 
 void task1(void * parameters)
 {
@@ -59,7 +57,6 @@ void task1(void * parameters)
     }
 }
 
-
 void setup()
 {
     Serial.begin(115200); // initialize serial communication
@@ -74,7 +71,6 @@ void setup()
         NULL
     );
 }
-
 
 void loop()
 {
