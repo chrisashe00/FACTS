@@ -1,18 +1,11 @@
 #include <Arduino.h>
 #include <Stepper.h>
 
-<<<<<<< HEAD
-/*================PIN DEFINITIONS================*/
-#define LEDC_CHANNEL_0  0
-#define LEDC_CHANNEL_1  1
-#define LEDC_CHANNEL_2  2
-#define LEDC_CHANNEL_3  3
-=======
+
 const int stepsPerRevolution = 200; // change this to match the number of steps per revolution for your motor
 const int stepAngle = 1.8;
 
 Stepper myStepper(stepsPerRevolution, 14, 27, 26, 25); // initialize the stepper library with the number of steps per revolution and the pin numbers
->>>>>>> AccelStepper
 
 int ZPosition = 0; 
 
