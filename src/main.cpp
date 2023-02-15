@@ -226,6 +226,8 @@ void setup()
         NULL
     );
 
+    vTaskStartScheduler();
+
 }
 
 
