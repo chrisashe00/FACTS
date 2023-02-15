@@ -93,7 +93,7 @@ void stepy(void * parameters)
                 Serial.println("mm");
         
 
-                mySteppery.step(- stepsPerRevolution); // rotate the stepper motor by a quarter turn in the counterclockwise direction
+                mySteppery.step(- Revs * stepsPerRevolution); // rotate the stepper motor by a quarter turn in the counterclockwise direction
             }
 
             else if (receivedy == 'b')
@@ -107,7 +107,7 @@ void stepy(void * parameters)
                 Serial.print(YPosition);
                 Serial.println("mm");
 
-                mySteppery.step(stepsPerRevolution); // rotate the stepper motor by a quarter turn in the clockwise direction
+                mySteppery.step(Revs * stepsPerRevolution); // rotate the stepper motor by a quarter turn in the clockwise direction
             }
         
 
@@ -147,7 +147,7 @@ void stepx(void * parameters)
                 Serial.println("mm");
         
 
-                myStepperx.step(stepsPerRevolution); // rotate the stepper motor by a quarter turn in the counterclockwise direction
+                myStepperx.step(- Revs *stepsPerRevolution); // rotate the stepper motor by a quarter turn in the counterclockwise direction
             }
 
             else if (receivedx == 'x')
@@ -161,7 +161,7 @@ void stepx(void * parameters)
                 Serial.print(XPosition);
                 Serial.println("mm");
 
-                myStepperx.step(stepsPerRevolution); // rotate the stepper motor by a quarter turn in the clockwise direction
+                myStepperx.step(Revs * stepsPerRevolution); // rotate the stepper motor by a quarter turn in the clockwise direction
             }
         
 
@@ -183,15 +183,6 @@ void stepx(void * parameters)
 
 void setup()
 {
-        // Set the pin mode for the pins to be output
-    pinMode(14, OUTPUT);
-    pinMode(27, OUTPUT);
-    pinMode(26, OUTPUT);
-    pinMode(25, OUTPUT);
-    pinMode(33, OUTPUT);
-    pinMode(32, OUTPUT);
-    pinMode(35, OUTPUT);
-    pinMode(34, OUTPUT);
 
     Serial.begin(115200); // initialize serial communication
     myStepperz.setSpeed(60); // set the speed of the stepper motor
@@ -225,8 +216,6 @@ void setup()
         1,
         NULL
     );
-
-    vTaskStartScheduler();
 
 }
 
