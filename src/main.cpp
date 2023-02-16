@@ -2,20 +2,25 @@
 #include <Stepper.h>
 
 const int stepsPerRevolution = 200; // change this to match the number of steps per revolution for your motor
-const int stepsPerRevolutionx = 200;
-const int stepsPerRevolutiony = 200;
+
 const float stepAngle = 1.8; // NEMA 11 step angle in degrees
 const float stepRad = stepAngle * (3.141 / 180); // step angle in radians 
 
-Stepper myStepperz(stepsPerRevolution, 1,2,3,4); // initialize the stepper library with the number of steps per revolution and the pin numbers
-Stepper myStepperx(stepsPerRevolutionx,14,27,26,25);
-Stepper mySteppery(stepsPerRevolutiony,33,32,35,34);
+int LEDlevel = 0;
+
+// pins 33,32,35,34 give error? 
+Stepper myStepperz(stepsPerRevolution,14,27,26,25); // initialize the stepper library with the number of steps per revolution and the pin numbers
+Stepper myStepperx(stepsPerRevolution,1,2,3,4);
+Stepper mySteppery(stepsPerRevolution,33,32,35,34);
 
 int ZPosition = 0;  //initial positions
 int YPosition = 0;
-int XPosition = 0; 
+int XPosition = 0;
+int ledPin = 12; 
+
+
 float Revs = 0.5; //Enter number of revs here
-float linDispScrew = ( 3.141 * 2.84 * Revs ) / 0.5;
+float linDispScrew = tan(0.5236) * 0.5 * 2 * 3.14159;
 
 void stepz(void * parameters)
 {
@@ -180,6 +185,34 @@ void stepx(void * parameters)
     }
 }
 
+void blueLED(void * parameters)
+{
+  for(;;)
+  {
+      if (Serial.available() > 0) {
+    char receivedLED = Serial.read();
+    // turn up LED brightness
+    if (receivedLED == '9') 
+    {
+      Serial.println("Increasing Brightness");
+      LEDlevel = LEDlevel + 51;
+      Serial.println(LEDlevel);
+    }
+    // turn down LED brightness
+    else if (receivedLED=='8') 
+    {
+      Serial.println("Decreasing Brightness");
+      LEDlevel = LEDlevel - 51;
+      Serial.println(LEDlevel);
+    }
+    }
+  }
+
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    Serial.print("blueLED stack high water mark: ");
+    Serial.println(uxTaskGetStackHighWaterMark(NULL));
+
+}
 
 void setup()
 {
@@ -200,22 +233,31 @@ void setup()
     // );
 
         xTaskCreate(
-        stepy,
-        "stepy",
-        6000,
-        NULL,
-        2,
-        NULL
-    );
-
-        xTaskCreate(
-        stepx,
-        "stepx",
-        6000,
+        blueLED,
+        "blueLED",
+        8000,
         NULL,
         1,
         NULL
     );
+
+    //     xTaskCreate(
+    //     stepy,
+    //     "stepy",
+    //     6000,
+    //     NULL,
+    //     2,
+    //     NULL
+    // );
+
+    //     xTaskCreate(
+    //     stepx,
+    //     "stepx",
+    //     6000,
+    //     NULL,
+    //     1,
+    //     NULL
+    // );
 
 }
 
