@@ -6,12 +6,14 @@ const int stepsPerRevolution = 200; // change this to match the number of steps 
 const float stepAngle = 1.8; // NEMA 11 step angle in degrees
 const float stepRad = stepAngle * (3.141 / 180); // step angle in radians 
 
-int LEDlevel = 0;
+
+const int BLUE_LED_PIN = 12; // change this to match the pin you've connected the LED to
+int brightness = 128; // starting brightness for the LED
 
 // pins 33,32,35,34 give error? 
-Stepper myStepperz(stepsPerRevolution,14,27,26,25); // initialize the stepper library with the number of steps per revolution and the pin numbers
-Stepper myStepperx(stepsPerRevolution,1,2,3,4);
-Stepper mySteppery(stepsPerRevolution,33,32,35,34);
+Stepper myStepperz(stepsPerRevolution,1,2,3,4); // initialize the stepper library with the number of steps per revolution and the pin numbers
+Stepper myStepperx(stepsPerRevolution,15,2,4,5);
+Stepper mySteppery(stepsPerRevolution,14,27,26,25);
 
 int ZPosition = 0;  //initial positions
 int YPosition = 0;
@@ -19,7 +21,7 @@ int XPosition = 0;
 int ledPin = 12; 
 
 
-float Revs = 0.5; //Enter number of revs here
+float Revs = 0.4; //Enter number of revs here
 float linDispScrew = tan(0.5236) * 0.5 * 2 * 3.14159;
 
 void stepz(void * parameters)
@@ -70,7 +72,7 @@ void stepz(void * parameters)
         }
             
         // Print the stack high water mark for task1
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        // vTaskDelay(1000 / portTICK_PERIOD_MS);
         // Serial.print("stepz stack high water mark: ");
         // Serial.println(uxTaskGetStackHighWaterMark(NULL));
     }
@@ -125,9 +127,9 @@ void stepy(void * parameters)
         }
             
         // Print the stack high water mark for task1
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-        Serial.print("stepy stack high water mark: ");
-        Serial.println(uxTaskGetStackHighWaterMark(NULL));
+        // vTaskDelay(1000 / portTICK_PERIOD_MS);
+        // Serial.print("stepy stack high water mark: ");
+        // Serial.println(uxTaskGetStackHighWaterMark(NULL));
     }
 }
 
@@ -179,9 +181,9 @@ void stepx(void * parameters)
         }
             
         // Print the stack high water mark for task1
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-        Serial.print("stepx stack high water mark: ");
-        Serial.println(uxTaskGetStackHighWaterMark(NULL));
+        // vTaskDelay(1000 / portTICK_PERIOD_MS);
+        // Serial.print("stepx stack high water mark: ");
+        // Serial.println(uxTaskGetStackHighWaterMark(NULL));
     }
 }
 
@@ -189,38 +191,42 @@ void blueLED(void * parameters)
 {
   for(;;)
   {
-      if (Serial.available() > 0) {
-    char receivedLED = Serial.read();
-    // turn up LED brightness
-    if (receivedLED == '9') 
-    {
-      Serial.println("Increasing Brightness");
-      LEDlevel = LEDlevel + 51;
-      Serial.println(LEDlevel);
-    }
-    // turn down LED brightness
-    else if (receivedLED=='8') 
-    {
-      Serial.println("Decreasing Brightness");
-      LEDlevel = LEDlevel - 51;
-      Serial.println(LEDlevel);
-    }
+     if (Serial.available()) {
+    char input = Serial.read();
+    if (input == '8') {
+      brightness = max(0, brightness - 32); // decrease brightness by 32 (out of 255)
+      analogWrite(BLUE_LED_PIN, brightness);
+      Serial.print("\n");
+      Serial.print("Current Brightness: ");
+      Serial.print(brightness);
+      Serial.print('\n');
+    } 
+    
+    else if (input == '9') {
+      brightness = min(255, brightness + 32); // increase brightness by 32 (out of 255)
+      analogWrite(BLUE_LED_PIN, brightness);
+      Serial.print("\n");
+      Serial.print("Current Brightness: ");
+      Serial.print(brightness);
+      Serial.print('\n');
     }
   }
 
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-    Serial.print("blueLED stack high water mark: ");
-    Serial.println(uxTaskGetStackHighWaterMark(NULL));
+  // vTaskDelay(1000/portTICK_PERIOD_MS);
+  // Serial.print("LED stack high water mark: ");
+  // Serial.println(uxTaskGetStackHighWaterMark(NULL));
+
+  }
 
 }
 
 void setup()
 {
-
+    pinMode(BLUE_LED_PIN, OUTPUT);
     Serial.begin(115200); // initialize serial communication
     myStepperz.setSpeed(60); // set the speed of the stepper motor
-    myStepperx.setSpeed(60);
-    mySteppery.setSpeed(60);
+    myStepperx.setSpeed(30);
+    mySteppery.setSpeed(30);
 
 
     // xTaskCreate(
@@ -232,34 +238,33 @@ void setup()
     //     NULL
     // );
 
+    //     xTaskCreate(
+    //     blueLED,
+    //     "blueLED",
+    //     10000,
+    //     NULL,
+    //     1,
+    //     NULL
+    // );
+
         xTaskCreate(
-        blueLED,
-        "blueLED",
+        stepy,
+        "stepy",
         8000,
         NULL,
         1,
         NULL
     );
 
-    //     xTaskCreate(
-    //     stepy,
-    //     "stepy",
-    //     6000,
-    //     NULL,
-    //     2,
-    //     NULL
-    // );
-
-    //     xTaskCreate(
-    //     stepx,
-    //     "stepx",
-    //     6000,
-    //     NULL,
-    //     1,
-    //     NULL
-    // );
+        xTaskCreate(
+        stepx,
+        "stepx",
+        8000,
+        NULL,
+        1,
+        NULL
+    );
 
 }
-
 
 void loop(){}
