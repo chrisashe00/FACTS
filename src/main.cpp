@@ -78,7 +78,6 @@ void stepz(void * parameters)
     }
 }
 
-
 void stepy(void * parameters)
 {
     for(;;)
@@ -117,18 +116,52 @@ void stepy(void * parameters)
                 mySteppery.step(Revs * stepsPerRevolution); // rotate the stepper motor by a quarter turn in the clockwise direction
             }
         
+            else if (receivedy == 'c')
+            {
+                Serial.println("Displacing -X (left)");
+        
+                XPosition = XPosition - linDispScrew;
+        
+
+                Serial.print("\n");
+                Serial.print("X position:   ");
+                Serial.print(XPosition);
+                Serial.println("mm");
+        
+
+                myStepperx.step(- Revs *stepsPerRevolution); // rotate the stepper motor by a quarter turn in the counterclockwise direction
+            }
+
+            else if (receivedy == 'x')
+            {
+                Serial.println("Displacing +X (right)");
+
+                XPosition = XPosition + linDispScrew ;
+
+                Serial.print("\n");
+                Serial.print("X Position:  ");
+                Serial.print(XPosition);
+                Serial.println("mm");
+
+                myStepperx.step(Revs * stepsPerRevolution); // rotate the stepper motor by a quarter turn in the clockwise direction
+            }
+        
 
             else if (receivedy == 'r')
             { 
                 YPosition = 0;
+                XPosition = 0;
 
-                Serial.println("Y Position set to 0 mm.");
+                Serial.println("X Position set to 0 mm");
+                Serial.println("Y Position set to 0 mm");
             }
+
+
         }
-            
+
         // Print the stack high water mark for task1
-        // vTaskDelay(1000 / portTICK_PERIOD_MS);
-        // Serial.print("stepy stack high water mark: ");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        // Serial.print("delaying input: ");
         // Serial.println(uxTaskGetStackHighWaterMark(NULL));
     }
 }
@@ -181,8 +214,8 @@ void stepx(void * parameters)
         }
             
         // Print the stack high water mark for task1
-        // vTaskDelay(1000 / portTICK_PERIOD_MS);
-        // Serial.print("stepx stack high water mark: ");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        // Serial.print("Delaying Inputs");
         // Serial.println(uxTaskGetStackHighWaterMark(NULL));
     }
 }
@@ -225,8 +258,8 @@ void setup()
     pinMode(BLUE_LED_PIN, OUTPUT);
     Serial.begin(115200); // initialize serial communication
     myStepperz.setSpeed(60); // set the speed of the stepper motor
-    myStepperx.setSpeed(30);
-    mySteppery.setSpeed(30);
+    myStepperx.setSpeed(20);
+    mySteppery.setSpeed(20);
 
 
     // xTaskCreate(
@@ -247,14 +280,14 @@ void setup()
     //     NULL
     // );
 
-        xTaskCreate(
-        stepy,
-        "stepy",
-        8000,
-        NULL,
-        1,
-        NULL
-    );
+    //     xTaskCreate(
+    //     stepy,
+    //     "stepy",
+    //     8000,
+    //     NULL,
+    //     1,
+    //     NULL
+    // );
 
         xTaskCreate(
         stepx,
