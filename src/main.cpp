@@ -21,7 +21,7 @@ int XPosition = 0;
 int ledPin = 12; 
 
 
-float Revs = 0.4; //Enter number of revs here
+float Revs = 1; //Enter number of revs here
 float linDispScrew = tan(0.5236) * 0.5 * 2 * 3.14159;
 
 void stepz(void * parameters)
