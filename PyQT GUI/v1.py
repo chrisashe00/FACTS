@@ -1,8 +1,10 @@
-
+import PyQt5 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtGui import QImage
 import cv2, imutils
+
+
 
 class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
