@@ -1,57 +1,197 @@
 #include <Arduino.h>
 #include <Stepper.h>
 
+static int taskCore = 1;
+
+
 const int stepsPerRevolution = 200; // steps per rev for our motors
 const float stepAngle = 1.8; // our motor's step angle in degrees
 const float stepRad = stepAngle * (3.141 / 180); // step angle in radians 
 
-int brightness = 128; // starting brightness for the LED
 int blue_brightness = 0; // starting brightness for the blue LED
 int lime_brightness = 0; // starting brightness for the lime LED
 
-int fadeAmount = 5; // How much to change the brightness each step when fading
+int fadeAmount = 17; // How much to change the brightness each step when fading
 bool isFading = false; // Whether the LED is currently fading
 
 
 // -----pins 33,32,35,34 give error-----
-Stepper myStepperz(stepsPerRevolution,1,2,3,4); // Z stepper and pins 
-Stepper myStepperx(stepsPerRevolution,5,18,19,21); // X stepper and pins
-Stepper mySteppery(stepsPerRevolution,14,27,26,25); // Y stepper and pins 
+Stepper myStepperz(stepsPerRevolution,14,27,26,25); // Z stepper and pins 
+Stepper myStepperx(stepsPerRevolution,5,18,19,21); // X stepper and pins 
+Stepper mySteppery(stepsPerRevolution,1,2,3,4); // Y stepper and pins 
 
 const int BLUE_LED_PIN = 12; // Blue LED pin assignment
 const int LIME_LED_PIN = 13; // Lime LED pin assignment
 
 int ZPosition = 0;  //initialise positions
 int YPosition = 0;
-@ -226,37 +232,120 @@ void blueLED(void * parameters)
+int XPosition = 0;
+
+float Revs = 1; //Enter number of revs here
+
+// Screw Equation,gives linear displacement of Z stage, tan(helix angle) * Thread Pitch * 2 * pi ... *M3 screw
+float linDispScrew = tan(0.5236) * 0.5 * 2 * 3.14159; 
+
+// Create an array to store the linear displacement of the screw for each key press
+const int MAX_KEY_PRESSES = 10;
+float linDispScrewArr[MAX_KEY_PRESSES];
+int keyPressCount = 0;
+
+#define MAX_ARRAY_SIZE 50
+float zDispArray[MAX_ARRAY_SIZE];
+int zDispIndex = 0;
+
+//Z stage step function
+void stepz(void * parameters)
+{
+    for(;;)
+    {
+        if (Serial.available())
+        //read the character received and perform operations if it matches what the code wants
+        {
+
+            char received1 = Serial.read();
+            if (received1 == 'd')
+            {
+                Serial.println("Displacing -Z");
+
+                ZPosition = ZPosition - linDispScrew;
+
+                zDispArray[zDispIndex] = linDispScrew;
+                zDispIndex++;
+
+                if (zDispIndex >= MAX_ARRAY_SIZE) {
+                    Serial.println("Array is full.");
+                    zDispIndex = 0;
+                }
+
+                Serial.print("\n");
+                Serial.print("Z position:   ");
+                Serial.print(ZPosition);
+                Serial.println("mm");
+
+                myStepperz.step(- Revs * stepsPerRevolution); // rotate the stepper motor by a quarter turn in the counterclockwise direction
+            }
+
+            else if (received1 == 'u')
+            {
+                Serial.println("Displacing +Z");
+
+                ZPosition = ZPosition + linDispScrew ;
+
+                zDispArray[zDispIndex] = linDispScrew;
+                zDispIndex++;
+
+                if (zDispIndex >= MAX_ARRAY_SIZE) {
+                    Serial.println("Array is full.");
+                    zDispIndex = 0;
+                }
+
+                Serial.print("\n");
+                Serial.print("Z Position:  ");
+                Serial.print(ZPosition);
+                Serial.println("mm");
+
+                myStepperz.step(Revs * stepsPerRevolution); // rotate the stepper motor by a quarter turn in the clockwise direction
+            }
+
+            //Reset the gauge displacement if char received is an r
+            else if (received1 == 'r')
+            {
+                ZPosition = 0;
+
+                Serial.println("Z Position set to 0 mm.");
+
+                // Print the contents of the array
+                Serial.print("zDispArray contents: ");
+                for (int i = 0; i < zDispIndex; i++) {
+                    Serial.print(zDispArray[i]);
+                    Serial.print(", ");
+                }
+                Serial.println();
+            }
+        }
+
+        // Print the stack high water mark for task1
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+        // Serial.print("stepz stack high water mark: ");
+        // Serial.println(uxTaskGetStackHighWaterMark(NULL));
+    }
+}
+
+void stepx(void * parameters)
+{
+    for(;;)
+    {
+        if (Serial.available())
+        {
+
+            char receivedx = Serial.read();
+            if (receivedx == 'c')
+            {
+                Serial.println("Displacing -X (left)");
+        
+                XPosition = XPosition - linDispScrew;
+        
+
+                Serial.print("\n");
+                Serial.print("X position:   ");
+                Serial.print(XPosition);
+                Serial.println("mm");
+        
+
+                myStepperx.step(- Revs *stepsPerRevolution); // rotate the stepper motor by a quarter turn in the counterclockwise direction
+            }
+
+            else if (receivedx == 'x')
+            {
+                Serial.println("Displacing +X (right)");
+
+                XPosition = XPosition + linDispScrew ;
+
+                Serial.print("\n");
+                Serial.print("X Position:  ");
+                Serial.print(XPosition);
+                Serial.println("mm");
+
+                myStepperx.step(Revs * stepsPerRevolution); // rotate the stepper motor by a quarter turn in the clockwise direction
+            }
+        
+
+            else if (receivedx == 'r')
+            { 
+                YPosition = 0;
+
+                Serial.println("X Position set to 0 mm.");
+            }
+        }
+            
+        // Print the stack high water mark for task1
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        // Serial.print("Delaying Inputs");
+        // Serial.println(uxTaskGetStackHighWaterMark(NULL));
+    }
+}
+
+void blueLED(void * parameters)
+{
   for(;;)
   {
      if (Serial.available()) {
-    char input = Serial.read();
-    if (input == '8') {
-      brightness = max(0, brightness - 32); // decrease brightness by 32 (out of 255)
-      analogWrite(BLUE_LED_PIN, brightness);
     char blue_input = Serial.read();
     if (blue_input == '9') {
       blue_brightness = max(0, blue_brightness - 32); // decrease brightness by 32 (out of 255)
       analogWrite(BLUE_LED_PIN, blue_brightness);
       Serial.print("\n");
-      Serial.print("Current Brightness: ");
-      Serial.print(brightness);
       Serial.print("Current BLUE Brightness: ");
       Serial.print(blue_brightness);
       Serial.print('\n');
     } 
     
-    else if (input == '9') {
-      brightness = min(255, brightness + 32); // increase brightness by 32 (out of 255)
-      analogWrite(BLUE_LED_PIN, brightness);
     else if (blue_input == '8') {
       blue_brightness = min(255, blue_brightness + 32); // increase brightness by 32 (out of 255)
       analogWrite(BLUE_LED_PIN, blue_brightness);
       Serial.print("\n");
-      Serial.print("Current Brightness: ");
-      Serial.print(brightness);
       Serial.print("Current BLUE Brightness: ");
       Serial.print(blue_brightness);
       Serial.print('\n');
@@ -82,9 +222,9 @@ int YPosition = 0;
             blue_brightness = 255;
         }
   }
-  }
+  vTaskDelay(50/portTICK_PERIOD_MS);
 
-  vTaskDelay(1000/portTICK_PERIOD_MS);
+  }
 
 void limeLED(void * parameters)
 {
@@ -137,18 +277,12 @@ void limeLED(void * parameters)
             analogWrite(LIME_LED_PIN, lime_brightness);
             vTaskDelay(50/portTICK_PERIOD_MS);
         }
-
-        else{
-            lime_brightness = 255;
-        }
     
 
-     //   vTaskDelay(500/portTICK_PERIOD_MS);
+       vTaskDelay(500/portTICK_PERIOD_MS);
   // Serial.print("LED stack high water mark: ");
   // Serial.println(uxTaskGetStackHighWaterMark(NULL));
-
   }
-
 }
 
 void setup()
@@ -158,13 +292,27 @@ void setup()
     Serial.begin(115200); 
     myStepperz.setSpeed(60); // set the speed of the stepper motors
     myStepperx.setSpeed(60);
-@ -279,27 +368,36 @@
-        1000,
+    mySteppery.setSpeed(60);
+
+    //functions are below, you can comment them out if you don't wanna call them 
+
+    xTaskCreate(
+        stepz,
+        "stepz",
+        5000,
         NULL,
         1,
-        NULL
         0
     );
+
+    //     xTaskCreate(
+    //     blueLED,
+    //     "blueLED",
+    //     1000,
+    //     NULL,
+    //     1,
+    //     0
+    // );
 
         xTaskCreate(
         limeLED,
