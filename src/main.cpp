@@ -8,7 +8,7 @@ const float stepRad = stepAngle * (3.141 / 180); // step angle in radians
 int blue_brightness = 0; // starting brightness for the blue LED
 int lime_brightness = 0; // starting brightness for the lime LED
 
-int fadeAmount = 5; // How much to change the brightness each step when fading
+int fadeAmount = 17; // How much to change the brightness each step when fading
 bool isFading = false; // Whether the LED is currently fading
 
 
@@ -276,8 +276,9 @@ void blueLED(void * parameters)
             blue_brightness = 255;
         }
   }
-  }
+  vTaskDelay(50/portTICK_PERIOD_MS);
 
+  }
 
 void limeLED(void * parameters)
 {
@@ -330,13 +331,9 @@ void limeLED(void * parameters)
             analogWrite(LIME_LED_PIN, lime_brightness);
             vTaskDelay(50/portTICK_PERIOD_MS);
         }
-
-        else{
-            lime_brightness = 255;
-        }
     
 
-     //   vTaskDelay(500/portTICK_PERIOD_MS);
+       vTaskDelay(500/portTICK_PERIOD_MS);
   // Serial.print("LED stack high water mark: ");
   // Serial.println(uxTaskGetStackHighWaterMark(NULL));
   }
@@ -353,23 +350,23 @@ void setup()
 
     //functions are below, you can comment them out if you don't wanna call them 
 
-    // xTaskCreate(
-    //     stepz,
-    //     "stepz",
-    //     5000,
-    //     NULL,
-    //     1,
-    //     NULL
-    // );
-
-        xTaskCreate(
-        blueLED,
-        "blueLED",
-        1000,
+    xTaskCreate(
+        stepz,
+        "stepz",
+        5000,
         NULL,
         1,
-        0
+        1
     );
+
+    //     xTaskCreate(
+    //     blueLED,
+    //     "blueLED",
+    //     1000,
+    //     NULL,
+    //     1,
+    //     0
+    // );
 
         xTaskCreate(
         limeLED,
