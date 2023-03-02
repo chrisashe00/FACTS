@@ -1,5 +1,5 @@
 import cv2
-print(cv2._version_)
+print(cv2.__version__)
 dispW=320
 dispH=240
 flip=2
