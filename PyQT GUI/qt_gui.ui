@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1043</width>
+    <height>824</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="Left_Widgets">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>1</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>141</width>
+        <height>781</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Left Widget Column</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="cam1_on">
+         <property name="text">
+          <string>Camera 1 On</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="cam1_off">
+         <property name="text">
+          <string>Camera 1 Off</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="cam1_bri_label">
+         <property name="maximumSize">
+          <size>
+           <width>121</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Brightness Camera 1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="cam1_bri_slider">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="cam1_con_label">
+         <property name="maximumSize">
+          <size>
+           <width>121</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Contrast Camera 1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="cam1_con_slider">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="cam1_denoise">
+         <property name="text">
+          <string>Denoise Camera 1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="img1_takeimg">
+         <property name="text">
+          <string>Camera 1 Image</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="img1_bri_label">
+         <property name="maximumSize">
+          <size>
+           <width>121</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Brightness Image 1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="img1_bri_slider">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="img1_con_label">
+         <property name="maximumSize">
+          <size>
+           <width>121</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Contrast Image 1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="img1_con_slider">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="img1_denoise">
+         <property name="text">
+          <string>Denoise Image 1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="autofocus_on">
+         <property name="text">
+          <string>Enable Autofocus</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="autofocus_off">
+         <property name="text">
+          <string>Disable Autofocus</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QGroupBox" name="Centre_Widgets">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>9</horstretch>
+        <verstretch>9</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>731</width>
+        <height>781</height>
+       </size>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="2" column="0">
+        <widget class="QLabel" name="imgcam1">
+         <property name="text">
+          <string>Image 1</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="camfeed2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Camera Feed 2 </string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QLabel" name="imgcam2">
+         <property name="text">
+          <string>Image 2</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="camfeed1">
+         <property name="text">
+          <string>Camera Feed 1 </string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>10</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QGroupBox" name="Right_Widgets">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>1</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>141</width>
+        <height>781</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Right Widget Column</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPushButton" name="pushButton_8">
+         <property name="text">
+          <string>Camera 2  On</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_9">
+         <property name="text">
+          <string>Camera 2 Off</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="cam2_bri_label">
+         <property name="maximumSize">
+          <size>
+           <width>121</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Brightness Camera 2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="cam2_bri_slider">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="cam2_con_label">
+         <property name="maximumSize">
+          <size>
+           <width>121</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Contrast Camera 2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="cam2_con_slider">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_10">
+         <property name="text">
+          <string>Denoise Camera 2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_11">
+         <property name="text">
+          <string>Camera 2 Image</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="im2_bri_label">
+         <property name="maximumSize">
+          <size>
+           <width>121</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Brightness Image 2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="img2_bri_slider">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="img2_con_label">
+         <property name="maximumSize">
+          <size>
+           <width>121</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Contrast Image 2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="img2_con_slider">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_12">
+         <property name="text">
+          <string>Denoise Image 2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="xystg_pos_label">
+         <property name="maximumSize">
+          <size>
+           <width>121</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>X-Y Stage Position</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="xystg_pos_value">
+         <property name="maximumSize">
+          <size>
+           <width>121</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="zstg_pos_label">
+         <property name="maximumSize">
+          <size>
+           <width>121</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Z Stage Position</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="zstg_pos_value">
+         <property name="maximumSize">
+          <size>
+           <width>121</width>
+           <height>28</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
