@@ -11,7 +11,7 @@ from qtmodern.windows import ModernWindow
 class MyWindow(QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
-        loadUi('qt_gui.ui', self)
+        loadUi('qt_gui_v2.ui', self)
         self.show()
 
 if __name__ == "__main__":

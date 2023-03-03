@@ -36,7 +36,7 @@ class VideoThread(QThread):
 class MyWindow(QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
-        loadUi('qt_gui.ui', self)
+        loadUi('qt_gui_v2.ui', self)
         self.show()
 
         self.thread_cam1 = None
