@@ -27,9 +27,9 @@ const int ZB1B = 21;
 const int blueLedPin = 12; // Blue LED
 const int limeLedPin = 13; // Lime LED
 
-const int xControlPin = 15; //X,Y,Z Switches
-const int yControlPin = 16;
-const int zControlPin = 17;
+// ---------------- PS3 Controller Initialise ------------ //
+int player = 0;
+int battery = 0;
 
 // ---------------- Variables ------------ //
 
@@ -58,38 +58,54 @@ Stepper myStepperX(stepsPerRevolution,XA1A,XA1B,XB1A,XB1B); // X
 Stepper myStepperY(stepsPerRevolution,YA1A,YA1B,YB1A,YB1B); // Y 
 Stepper myStepperZ(stepsPerRevolution,ZA1A,ZA1B,ZB1A,ZB1B); // Z 
 
-// ------------------ Z Stage Stepper function -------------- //
+// ------------------ Connect PS3 controller -------------- //
+void onConnect(){
+    Serial.println("Connected.");
+}
 
+// ------------------ Z Stage Stepper function -------------- //
 void stepZ(void *parameters) {
     for (;;) {
-        if (Serial.available()) {
-            char receivedZ = Serial.read();
-            if (receivedZ == 'd') {
-                Serial.println("Displacing -Z");
+    if( Ps3.event.button_down.down ) {
+                Serial.print("Displacing -Z");
                 zPosition = zPosition - linDispScrew; //What ESP32 thinks displacement is
-                Serial.println("\nZ position: ");
-                Serial.println(zPosition);
-                Serial.println("mm");
+                Serial.print("\nZ position: ");
+                Serial.print(zPosition);
+                Serial.print("mm");
+            
                 //This performs actual rotation, should translate to Downward displacement
-                myStepperZ.step(-Revs * stepsPerRevolution); 
-            }
-            else if (receivedZ == 'u') {
+                myStepperZ.step(- Revs * stepsPerRevolution);
+
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+                Serial.println("I reached beyond step function in code");
+    }
+    
+    else if( Ps3.event.button_down.up ) {
+
                 Serial.println("Displacing +Z");
                 zPosition = zPosition + linDispScrew ; //What ESP32 thinks displacement is
-                Serial.print("\nZ Position:  ");
+                Serial.print("\nZ Position: ");
                 Serial.print(zPosition);
-                Serial.println("mm");
+                Serial.print("mm");
                 //This performs actual rotation, should translate to Upward displacement
                 myStepperZ.step(Revs * stepsPerRevolution);
+
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+
             }
-            else if (receivedZ == 'r') {
+    else if( Ps3.event.button_down.ps ) {
                 zPosition = 0; //Reset the gauge displacement if char received is an r
-                Serial.println("Z Position set to 0 mm.");
+                Serial.println("\nZ Position set to 0 mm.");
             }
+    else {
+            Serial.println("Received no Inputs");
+            vTaskDelay(1000 / portTICK_PERIOD_MS); //This adds a short delay before starting a queued function
         }
-        vTaskDelay(30 / portTICK_PERIOD_MS); //This adds a short delay before starting a queued function
+
+        }
     }
-}
+
 
 // ------------------ Y Stage Stepper function -------------- //
 
@@ -117,10 +133,10 @@ void stepY(void *parameters) {
             }
             else if (receivedY == 'r') {
                 zPosition = 0; //Reset the gauge displacement if char received is an r
-                Serial.println("Y Position set to 0 mm.");
+                Serial.println("\nY Position set to 0 mm.");
             }
+            
         }
-        vTaskDelay(30 / portTICK_PERIOD_MS); //This adds a short delay before starting a queued function
     }
 }
 
@@ -257,11 +273,18 @@ void limeLed(void *parameters) {
 
 void setup()
 {
+    Ps3.attachOnConnect(onConnect);
+    Ps3.begin("C0:49:EF:D3:6C:D6");
+
+    Serial.println("Ready.");
+    Serial.print("Setting LEDs to player "); 
+    Serial.println(player, DEC);
+    Ps3.setPlayer(player);
+
+    player = 1;
+
     pinMode(limeLedPin, OUTPUT);
     pinMode(blueLedPin,OUTPUT);
-    pinMode(xControlPin,OUTPUT);
-    pinMode(yControlPin,OUTPUT);
-    pinMode(zControlPin,OUTPUT);
     Serial.begin(115200); 
     myStepperZ.setSpeed(60); // set the speed of the stepper motors to 60 rpm
     myStepperX.setSpeed(60);
@@ -269,14 +292,14 @@ void setup()
 
 // ---------------- Function Calls ------------ //
 
-    // xTaskCreate(
-    //     stepZ,
-    //     "stepZ",
-    //     1000,
-    //     NULL,
-    //     1,
-    //     0
-    // );
+    xTaskCreate(
+        stepZ,
+        "stepZ",
+        8000,
+        NULL,
+        1,
+        NULL
+    );
 
     //     xTaskCreate(
     //     blueLed,
@@ -305,18 +328,19 @@ void setup()
     //     0
     // );
 
-        xTaskCreate(
-        stepX,
-        "stepX",
-        1000,
-        NULL,
-        1,
-        0
-    );
+    //     xTaskCreate(
+    //     stepX,
+    //     "stepX",
+    //     1000,
+    //     NULL,
+    //     1,
+    //     0
+    // );
 
 }
 
 
 // Loop Not used //
 void loop(){
+
 }
