@@ -8,31 +8,80 @@
 // create an instance of the stepper class, specifying
 // the number of steps of the motor and the pins it's
 // attached to
-Stepper stepper(STEPS, 14, 27 ,26, 25);
 
+const int stepPin = 26;
+const int dirPin = 27;
 
-void setup()
-{
-  Ps3.begin("01:02:03:04:05:06");
-  Serial.println("Ready.");
-
+void setup() {
   Serial.begin(115200);
-  Serial.println("Stepper test!");
-  // set the speed of the motor to 30 RPMs
-  stepper.setSpeed(60);
+  pinMode(stepPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
 }
 
-void loop()
-{
-  if (Ps3.isConnected()){
-    Serial.println("Connected!");
-  }
-  delay(3000);
-
-  if (Serial.available > 0 ){
-    const char command == Serial.read();
-
-    if (command == 'h'){}
-    
+void rotateClockwise() {
+  digitalWrite(dirPin, HIGH);
+  Serial.println("Rotating full clockwise (UP)");
+  for (int i = 0; i < 400; i++) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(1000);
   }
 }
+
+void rotateCounterClockwise() {
+  digitalWrite(dirPin, LOW);
+  Serial.println("Rotating full counter-clockwise (DOWN)");
+  for (int i = 0; i < 400; i++) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(1000);
+  }
+}
+
+void rotateClockwiseStep() {
+  digitalWrite(dirPin, HIGH);
+  Serial.println("Rotating steps clockwise (UP)");
+  for (int i = 0; i < 10; i++) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(1000);
+  }
+}
+
+void rotateCounterClockwiseStep() {
+  digitalWrite(dirPin, LOW);
+  Serial.println("Rotating steps counter clockwise (DOWN)");
+  Serial.println("clockwise ()");
+  for (int i = 0; i < 10; i++) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(1000);
+  }
+}
+
+
+void loop() {
+  if (Serial.available() > 0) {
+    char c = Serial.read();
+    switch (c) {
+      case 'h':
+        rotateClockwise();
+        break;
+      case 'l':
+        rotateCounterClockwise();
+        break;
+      case 'r':
+        rotateClockwiseStep();
+        break;
+      case 't':
+        rotateCounterClockwiseStep();
+        break;
+    }
+  }
+}
+
+
