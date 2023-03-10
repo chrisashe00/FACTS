@@ -10,6 +10,8 @@
             "includePath": [
                 "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/include",
                 "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/src",
+                "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/libdeps/esp32dev/AccelStepper/src",
+                "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/libdeps/esp32dev/StepperDriver/src",
                 "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/libdeps/esp32dev/Stepper/src",
                 "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/libdeps/esp32dev/PS3 Controller Host/src",
                 "C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/newlib/platform_include",
@@ -241,6 +243,8 @@
                 "path": [
                     "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/include",
                     "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/src",
+                    "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/libdeps/esp32dev/AccelStepper/src",
+                    "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/libdeps/esp32dev/StepperDriver/src",
                     "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/libdeps/esp32dev/Stepper/src",
                     "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/libdeps/esp32dev/PS3 Controller Host/src",
                     "C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/newlib/platform_include",

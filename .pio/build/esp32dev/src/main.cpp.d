@@ -126,7 +126,4 @@
  C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/hal/include/hal/esp_flash_err.h \
  C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/spi_flash/include/esp_spi_flash.h \
  C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/spi_flash/include/esp_spi_flash_counters.h \
- C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_hw_support/include/soc/esp32/spiram.h \
- .pio/libdeps/esp32dev/Stepper/src/Stepper.h \
- .pio/libdeps/esp32dev/PS3\ Controller\ Host/src/Ps3Controller.h \
- .pio/libdeps/esp32dev/PS3\ Controller\ Host/src/include/ps3.h
+ C:/Users/vchri/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_hw_support/include/soc/esp32/spiram.h
