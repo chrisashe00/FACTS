@@ -54,7 +54,6 @@ void rotateClockwiseStep() {
 void rotateCounterClockwiseStep() {
   digitalWrite(dirPin, LOW);
   Serial.println("Rotating steps counter clockwise (DOWN)");
-  Serial.println("clockwise ()");
   for (int i = 0; i < 10; i++) {
     digitalWrite(stepPin, HIGH);
     delayMicroseconds(1000);
