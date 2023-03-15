@@ -3,84 +3,57 @@
 #include <Ps3Controller.h>
 
 // change this to the number of steps on your motor
-#define STEPS 200
+#define stepsPerRev 200
 
-// create an instance of the stepper class, specifying
-// the number of steps of the motor and the pins it's
-// attached to
+const int slpPin = 33;
+const int ultPin = 32; 
 
-const int stepPin = 26;
-const int dirPin = 27;
+const int in1 = 14;
+const int in3 = 26;
+const int in2 = 27;
+const int in4 = 25;
+
+Stepper stepx(stepsPerRev, in1,in2,in3,in4);
+
 
 void setup() {
   Serial.begin(115200);
-  pinMode(stepPin, OUTPUT);
-  pinMode(dirPin, OUTPUT);
-}
 
-void rotateClockwise() {
-  digitalWrite(dirPin, HIGH);
-  Serial.println("Rotating full clockwise (UP)");
-  for (int i = 0; i < 400; i++) {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(1000);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(1000);
-  }
-}
+  stepx.setSpeed(100);
 
-void rotateCounterClockwise() {
-  digitalWrite(dirPin, LOW);
-  Serial.println("Rotating full counter-clockwise (DOWN)");
-  for (int i = 0; i < 400; i++) {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(1000);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(1000);
-  }
-}
+  pinMode(in4 , OUTPUT);
+  pinMode(in3 , OUTPUT);
+  pinMode(in2 , OUTPUT);
+  pinMode(in1 , OUTPUT);
 
-void rotateClockwiseStep() {
-  digitalWrite(dirPin, HIGH);
-  Serial.println("Rotating steps clockwise (UP)");
-  for (int i = 0; i < 10; i++) {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(1000);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(1000);
-  }
-}
+  pinMode(slpPin, OUTPUT);
 
-void rotateCounterClockwiseStep() {
-  digitalWrite(dirPin, LOW);
-  Serial.println("Rotating steps counter clockwise (DOWN)");
-  for (int i = 0; i < 10; i++) {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(1000);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(1000);
-  }
-}
+  digitalWrite(ultPin, HIGH);
+  digitalWrite(slpPin, HIGH);
 
+}
 
 void loop() {
-  if (Serial.available() > 0) {
-    char c = Serial.read();
-    switch (c) {
-      case 'h':
-        rotateClockwise();
-        break;
-      case 'l':
-        rotateCounterClockwise();
-        break;
-      case 'r':
-        rotateClockwiseStep();
-        break;
-      case 't':
-        rotateCounterClockwiseStep();
-        break;
-    }
-  }
+
+  digitalWrite(slpPin, HIGH);
+
+  stepx.step(stepsPerRev);
+
+  Serial.println("stepping");
+
+  delay(1000);
+
+  stepx.step(-stepsPerRev);
+
+  Serial.println("-stepping");
+
+  delay(1000);
+
+  // digitalWrite(slpPin, LOW);
+
+  // delay(1500);
+
+
 }
 
 
