@@ -3,7 +3,7 @@
 #include <Ps3Controller.h>
 
 // change this to the number of steps on your motor
-#define stepsPerRev 200
+#define stepsPerRev 20
 
 const int slpPin = 33;
 const int ultPin = 32; 
