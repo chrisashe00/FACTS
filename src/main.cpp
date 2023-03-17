@@ -3,7 +3,7 @@
 #include <Ps3Controller.h>
 
 // change this to the number of steps on your motor
-#define stepsPerRev 20
+#define stepsPerRev 200
 
 const int slpPin = 33;
 const int ultPin = 32; 
@@ -19,7 +19,7 @@ Stepper stepx(stepsPerRev, in1,in2,in3,in4);
 void setup() {
   Serial.begin(115200);
 
-  stepx.setSpeed(100);
+  stepx.setSpeed(60);
 
   pinMode(in4 , OUTPUT);
   pinMode(in3 , OUTPUT);
@@ -49,9 +49,9 @@ void loop() {
 
   delay(1000);
 
-  // digitalWrite(slpPin, LOW);
+  digitalWrite(slpPin, LOW);
 
-  // delay(1500);
+  delay(1500);
 
 
 }
