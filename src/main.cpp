@@ -19,15 +19,16 @@ const int YA1B = 18;
 const int YB1A = 19;
 const int YB1B = 21;
 
-const int ZA1A = 5; //Z Stage Stepper Pins
-const int ZA1B = 18;
-const int ZB1A = 19;
-const int ZB1B = 21;
-const int ZSLP = 4;
-const int ZULT = 2;
+const int ZA1A = 14; //Z Stage Stepper Pins
+const int ZA1B = 27;
+const int ZB1A = 26;
+const int ZB1B = 25;
+const int ZSLP = 33;
+const int ZULT = 32;
 
-const int blueLedPin = 12; // Blue LED
-const int limeLedPin = 13; // Lime LED
+const int fanCMDPin = 13; // Fan PWM pin 
+const int limeLedPin = 0; // Lime LED pin
+const int blueLedPin = 0; //Blue LED pin
 
 // ---------------- PS3 Controller Initialise ------------ //
 int player = 0;
@@ -38,8 +39,9 @@ int battery = 0;
 const int stepsPerRev = 200; // motor steps for one revolution
 const float stepAngle = 1.8; // motor step angle in degrees
 
-int blueBrightness = 0; // starting brightness for the blue LED
-int limeBrightness = 0; // starting brightness for the lime LED
+int blueBrightness = 255; // starting brightness for the blue LED
+int limeBrightness = 255; // starting brightness for the lime LED
+int fanBrightness = 255;
 
 int fadeAmount = 17; // How much to change the brightness each step when fading
 bool isFading = false; // Whether the LED is currently fading
@@ -61,32 +63,69 @@ Stepper myStepperZ(stepsPerRev,ZA1A,ZA1B,ZB1A,ZB1B); // Z
 // }
 
 // ------------------ Z Stage Stepper function -------------- //
+
 void stepZ(void *parameters) {
     for (;;) {
-        digitalWrite(ZSLP,HIGH);
-        digitalWrite(ZULT, LOW);
         if (Serial.available()){
             char receivedZ = Serial.read();
             switch(receivedZ){
                 case '1':
+                    digitalWrite(ZSLP,HIGH);
+                    vTaskDelay(50 / portTICK_PERIOD_MS);
                     myStepperZ.step(1);
                     Serial.println("Z stage performing +1 step");
+                    digitalWrite(ZSLP, LOW);
                     break;
 
                 case '2':
+                    digitalWrite(ZSLP,HIGH);
+                    vTaskDelay(50 / portTICK_PERIOD_MS);
                     myStepperZ.step(-1);
                     Serial.println("Z stage performing -1 step");
+                    digitalWrite(ZSLP, LOW);
                     break;
 
                 case '3':
+                    digitalWrite(ZSLP,HIGH);
                     myStepperZ.step(10);
                     Serial.println("Z stage performing +10 steps");
+                    digitalWrite(ZSLP, LOW);
                     break;
 
                 case '4':
+                    digitalWrite(ZSLP,HIGH);
                     myStepperZ.step(-10);
                     Serial.println("Z stage performing -10 steps");
+                    digitalWrite(ZSLP, LOW);
                     break;
+
+                case '5':
+                    digitalWrite(ZSLP,HIGH);
+                    myStepperZ.step(50);
+                    Serial.println("Z stage performing 50 steps");
+                    digitalWrite(ZSLP, LOW);
+                    break;
+
+                case '6':
+                    digitalWrite(ZSLP,HIGH);
+                    myStepperZ.step(-50);
+                    Serial.println("Z stage performing -50 steps");
+                    digitalWrite(ZSLP, LOW);
+                    break;
+
+                case '7':
+                    digitalWrite(ZSLP,HIGH);
+                    myStepperZ.step(100);
+                    Serial.println("Z stage performing 100 steps");
+                    digitalWrite(ZSLP, LOW);
+                    break;
+                case '8':
+                    digitalWrite(ZSLP,HIGH);
+                    myStepperZ.step(-100);
+                    Serial.println("Z stage performing -100 steps");
+                    digitalWrite(ZSLP, LOW);
+                    break;
+                    
                 default:
                     vTaskDelay(50 / portTICK_PERIOD_MS); //small delay between brightness updates
                     break;
@@ -96,7 +135,6 @@ void stepZ(void *parameters) {
     vTaskDelay(50 / portTICK_PERIOD_MS); //small delay between brightness updates
     }
 }
-
 
 
 // ------------------ Y Stage Stepper function -------------- //
@@ -119,47 +157,7 @@ void stepX(void *parameters) {
 
 void blueLed(void *parameters) {
     for (;;) {
-        if (Serial.available()) {
-            char blueInput = Serial.read();
-            if (blueInput == '1'){
-                blueBrightness = max(0, blueBrightness - 32); // decrease brightness by 32 (out of 255)
-                analogWrite(blueLedPin, blueBrightness);
-                Serial.print("\n");
-                Serial.print("Current Blue LED Brightness: ");
-                Serial.print(blueBrightness);
-                Serial.print('\n');
-            } 
-            else if (blueInput == '2'){
-                blueBrightness = min(255, blueBrightness + 32); // increase brightness by 32 (out of 255)
-                analogWrite(blueLedPin, blueBrightness);
-                Serial.print("\n");
-                Serial.print("Current Blue LED Brightness: ");
-                Serial.print(blueBrightness);
-                Serial.print('\n');
-            }
-            else if (blueInput == 'f'){
-                // Toggle fading on or off
-                isFading = !isFading;
-                if (isFading) {
-                    Serial.println("Fading started");
-                } 
-                else {
-                    Serial.println("Fading stopped");
-                }
-            }
-        }
-        if (isFading) {
-            blueBrightness += fadeAmount;
-            if (blueBrightness <= 0 || blueBrightness >= 255) {
-                // Reverse the fade direction when the brightness reaches the min or max value
-                fadeAmount = -fadeAmount;
-            }
-            analogWrite(blueLedPin, blueBrightness); //Write the updated brightness value to Pin
-            vTaskDelay(50 / portTICK_PERIOD_MS); //small delay between brightness updates
-        } 
-        else {
-            blueBrightness = 255; //Otherwise have 0 Brightness
-        }
+       
     }
 }
 
@@ -167,49 +165,18 @@ void blueLed(void *parameters) {
 
 void limeLed(void *parameters) {
     for (;;) {
-        if (Serial.available()) {
-            char limeInput = Serial.read();
-            if (limeInput == '1'){
-                limeBrightness = max(0, limeBrightness - 32); // decrease brightness by 32 (out of 255)
-                analogWrite(limeLedPin, limeBrightness);
-                Serial.print("\n");
-                Serial.print("Current Lime LED Brightness: ");
-                Serial.print(limeBrightness);
-                Serial.print('\n');
-            } 
-            else if (limeInput == '2'){
-                blueBrightness = min(255, limeBrightness + 32); // increase brightness by 32 (out of 255)
-                analogWrite(limeLedPin, limeBrightness);
-                Serial.print("\n");
-                Serial.print("Current Lime LED Brightness: ");
-                Serial.print(limeBrightness);
-                Serial.print('\n');
-            }
-            else if (limeInput == 'f'){
-                // Toggle fading on or off
-                isFading = !isFading;
-                if (isFading) {
-                    Serial.println("Fading started");
-                } 
-                else {
-                    Serial.println("Fading stopped");
-                }
-            }
-        }
-        if (isFading) {
-            limeBrightness += fadeAmount;
-            if (limeBrightness <= 0 || limeBrightness >= 255) {
-                // Reverse the fade direction when the brightness reaches the min or max value
-                fadeAmount = -fadeAmount;
-            }
-            analogWrite(limeLedPin, blueBrightness); //Write the updated brightness value to Pin
-            vTaskDelay(50 / portTICK_PERIOD_MS); //small delay between brightness updates
-        } 
-        else {
-            limeBrightness = 255; //Otherwise have 0 Brightness
-        }
+        
     }
 }
+
+void fanPWM(void *parameters) {
+    for (;;) {
+        
+    }
+}
+
+
+
 
 // ---------------- Setup: Simply calls the above Functions ------------ //
 
@@ -225,11 +192,21 @@ void setup()
 
     // player = 1;
 
-    pinMode(limeLedPin, OUTPUT);
-    pinMode(blueLedPin,OUTPUT);
+    // pinMode(limeLedPin, OUTPUT);
+    // pinMode(blueLedPin,OUTPUT);
+    pinMode(fanCMDPin, OUTPUT);
+
+    pinMode(ZA1A, OUTPUT);
+    pinMode(ZA1A, OUTPUT);
+    pinMode(ZA1A, OUTPUT);
+    pinMode(ZA1A, OUTPUT);
+
+    pinMode(ZSLP, OUTPUT);
+    pinMode(ZULT, OUTPUT);
+
     
-    // default SLP and ULT pins to high 
-    digitalWrite(ZSLP,HIGH);
+    // default SLP and ULT pins to low 
+    digitalWrite(ZSLP,LOW);
     digitalWrite(ZULT, LOW);
 
     Serial.begin(115200); 
@@ -242,11 +219,21 @@ void setup()
     xTaskCreate(
         stepZ,
         "stepZ",
-        8000,
+        2048,
         NULL,
         1,
         NULL
     );
+
+    xTaskCreate(
+        fanPWM,
+        "fanPWM",
+        2048,
+        NULL,
+        0,
+        NULL
+    );
+
 
     //     xTaskCreate(
     //     blueLed,
@@ -260,10 +247,10 @@ void setup()
     //     xTaskCreate(
     //     limeLed,
     //     "limeLed",
-    //     1000,
+    //     8000,
     //     NULL,
     //     1,
-    //     1
+    //     NULL
     // );
 
     //     xTaskCreate(
