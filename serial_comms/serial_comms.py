@@ -4,9 +4,9 @@
 import serial
 import time
 
-# arduino = serial.Serial('/dev/ttyACM0' , 115200, timeout=5)
+# esp32 = serial.Serial('/dev/ttyACM0' , 115200, timeout=5)
 
-arduino = serial.Serial(
+esp32 = serial.Serial(
     port = '/dev/ttyUSB0',
     baudrate = 115200,
     bytesize = serial.EIGHTBITS,
@@ -23,12 +23,12 @@ arduino = serial.Serial(
 
 while True: 
     try:
-        arduino.write("1".encode())
-        arduino.write("2".encode())
-        data = arduino.readline()
+        esp32.write("1".encode())
+        esp32.write("2".encode())
+        data = esp32.readline()
 
         if data:
             print(data)
     except Exception as e:
         print(e)
-        arduino.close()
+        esp32.close()
