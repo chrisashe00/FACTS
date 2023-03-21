@@ -41,7 +41,7 @@ Stepper myStepperZ(stepsPerRevolution,ZA1A,ZA1B,ZB1A,ZB1B); // Z
 // ------------------ Z Stage Stepper function -------------- //
 void stepZ(void *parameters){
     for (;;) {
-        Serial.println(".");
+
         if (Serial.available()){
             char receivedZ = Serial.read();
 
@@ -50,16 +50,19 @@ void stepZ(void *parameters){
             case '1': 
 
             digitalWrite(ZSLP,HIGH);
-            myStepperZ.step(5);
-            Serial.print("Stepping 5 steps CW");
+            vTaskDelay(10 / portTICK_PERIOD_MS);
+            myStepperZ.step(10);
+            Serial.print("Stepping 5 steps CW \n");
             digitalWrite(ZSLP, LOW);
+            break;
 
             case '2': 
-
+            vTaskDelay(10 / portTICK_PERIOD_MS);
             digitalWrite(ZSLP,HIGH);
-            myStepperZ.step(-5);
-            Serial.print("Stepping 5 steps CCW");
+            myStepperZ.step(-10);
+            Serial.print("Stepping 5 steps CCW \n");
             digitalWrite(ZSLP, LOW);
+            break;
 
             default:
 
@@ -70,8 +73,9 @@ void stepZ(void *parameters){
   
 }
             else{
-                vTaskDelay(50 / portTICK_PERIOD_MS);
-                Serial.println("delaying");
+                vTaskDelay(10 / portTICK_PERIOD_MS);
+                taskYIELD();
+                
             }
 }
 }
