@@ -1,7 +1,7 @@
 import serial
 import time
 
-arduino = serial.Serial('/dev/ttyACM0' , 115200, timeout=5)
+# arduino = serial.Serial('/dev/ttyACM0' , 115200, timeout=5)
 
 arduino = serial.Serial(
     port = '/dev/ttyACM0',
