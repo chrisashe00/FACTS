@@ -79,7 +79,9 @@ def autofocus():
             break 
 
         #Move objective lens to new position
-        #z_move() 
+        def z_move():
+            
+            pass
 
         #Save save energy value for previous snapshot 
         energy_last = energy
