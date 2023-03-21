@@ -64,6 +64,23 @@ void stepZ(void *parameters){
             digitalWrite(ZSLP, LOW);
             break;
 
+            case '3': 
+
+            digitalWrite(ZSLP,HIGH);
+            vTaskDelay(10 / portTICK_PERIOD_MS);
+            myStepperZ.step(5);
+            Serial.print("Stepping 5 steps CW \n");
+            digitalWrite(ZSLP, LOW);
+            break;
+
+            case '4': 
+            vTaskDelay(10 / portTICK_PERIOD_MS);
+            digitalWrite(ZSLP,HIGH);
+            myStepperZ.step(-5);
+            Serial.print("Stepping 5 steps CCW \n");
+            digitalWrite(ZSLP, LOW);
+            break;
+
             default:
 
             vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -95,7 +112,7 @@ void setup(){
     pinMode(ZULT,OUTPUT);
 
     Serial.begin(115200); 
-    myStepperZ.setSpeed(60); // set the speed of the stepper motors to 60 rpm
+    myStepperZ.setSpeed(20); // set the speed of the stepper motors to 60 rpm
     myStepperX.setSpeed(60);
 
 // ---------------- Function Calls ------------ //
