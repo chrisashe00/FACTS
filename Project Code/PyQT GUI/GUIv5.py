@@ -1,6 +1,8 @@
 #Greyscale
 import sys
 import cv2
+import os 
+import time 
 import threading
 import numpy as np
 from time import sleep
@@ -119,6 +121,11 @@ class MyWindow(QMainWindow):
             pixmap = QPixmap.fromImage(qimage)
             self.imgcam1.setPixmap(pixmap)
 
+            # Save the image to the computer
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            save_path = os.path.join(os.path.expanduser("~"), "Pictures", "CapturedImages", f"left_image_{timestamp}.png")
+            cv2.imwrite(save_path, frame)
+
     @pyqtSlot()
     def capture_right_camera_image(self):
         grabbed, frame = self.right_camera.read()
@@ -128,6 +135,11 @@ class MyWindow(QMainWindow):
             qimage = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format_RGB888).rgbSwapped()
             pixmap = QPixmap.fromImage(qimage)
             self.imgcam2.setPixmap(pixmap)
+
+            # Save the image to the computer
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            save_path = os.path.join(os.path.expanduser("~"), "Pictures", "CapturedImages", f"right_image_{timestamp}.png")
+            cv2.imwrite(save_path, frame)
 
     @pyqtSlot(int)
     def adjust_left_camera_brightness(self, value):
