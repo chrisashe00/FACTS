@@ -124,6 +124,8 @@ class MyWindow(QMainWindow):
             # Save the image to the computer
             timestamp = time.strftime("%Y%m%d-%H%M%S")
             save_path = os.path.join(os.path.expanduser("~"), "Pictures", "CapturedImages", f"left_image_{timestamp}.png")
+            if not os.path.exists(directory):
+                    os.makedirs(directory)
             cv2.imwrite(save_path, frame)
 
     @pyqtSlot()
@@ -139,6 +141,9 @@ class MyWindow(QMainWindow):
             # Save the image to the computer
             timestamp = time.strftime("%Y%m%d-%H%M%S")
             save_path = os.path.join(os.path.expanduser("~"), "Pictures", "CapturedImages", f"right_image_{timestamp}.png")
+            directory = os.path.join(os.path.expanduser("~"), "Pictures", "CapturedImages")
+            if not os.path.exists(directory):
+                    os.makedirs(directory)
             cv2.imwrite(save_path, frame)
 
     @pyqtSlot(int)
