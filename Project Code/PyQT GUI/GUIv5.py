@@ -1,6 +1,8 @@
 #Greyscale
 import sys
 import cv2
+import os 
+import time 
 import threading
 import numpy as np
 import time 
@@ -120,9 +122,17 @@ class MyWindow(QMainWindow):
             pixmap = QPixmap.fromImage(qimage)
             self.imgcam1.setPixmap(pixmap)
 
+<<<<<<< HEAD
             #Save image to computer
             timestamp = time.strftime("%Y%m%d-%H%M%S")
             save_path = os.path.join(os.path.expanduser("~")), "Pictures", "CapturedImages", f"left_image_{timestamp}.png"
+=======
+            # Save the image to the computer
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            save_path = os.path.join(os.path.expanduser("~"), "Pictures", "CapturedImages", f"left_image_{timestamp}.png")
+            if not os.path.exists(directory):
+                    os.makedirs(directory)
+>>>>>>> d92de75d8cd4286fa6c8fb694b5c3f8fcc96fb15
             cv2.imwrite(save_path, frame)
 
     @pyqtSlot()
@@ -135,11 +145,20 @@ class MyWindow(QMainWindow):
             pixmap = QPixmap.fromImage(qimage)
             self.imgcam2.setPixmap(pixmap)
 
+<<<<<<< HEAD
             #Save image to computer
             timestamp = time.strftime("%Y%m%d-%H%M%S")
             save_path = os.path.join(os.path.expanduser("~")), "Pictures", "CapturedImages", f"right_image_{timestamp}.png"
             print(frame.shape)
             print(save_path)
+=======
+            # Save the image to the computer
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            save_path = os.path.join(os.path.expanduser("~"), "Pictures", "CapturedImages", f"right_image_{timestamp}.png")
+            directory = os.path.join(os.path.expanduser("~"), "Pictures", "CapturedImages")
+            if not os.path.exists(directory):
+                    os.makedirs(directory)
+>>>>>>> d92de75d8cd4286fa6c8fb694b5c3f8fcc96fb15
             cv2.imwrite(save_path, frame)
 
     @pyqtSlot(int)
