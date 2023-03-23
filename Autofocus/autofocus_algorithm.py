@@ -5,12 +5,53 @@ camera as a measure of image contrast
 FS
 """
 
+# Code to start communication between jetson nano and esp32 only works on jetson nano 
+# Chris Ashe, 21/03/2023
+
 import cv2 
 import numpy as np
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
+import serial
+import time
 
+
+# Initialise Serial Comms
+# esp32 = serial.Serial('/dev/ttyACM0' , 115200, timeout=5)
+
+esp32 = serial.Serial(
+    port = '/dev/ttyUSB0',
+    baudrate = 115200,
+    bytesize = serial.EIGHTBITS,
+    parity = serial.PARITY_NONE,
+    stopbits = serial.STOPBITS_ONE,
+    timeout = 5,
+    xonxoff = False,
+    rtscts = False,
+    dsrdtr = False,
+    writeTimeout = 2
+)
+# This is just an example, you can put whatever you want here, the strings '1' '2' move the stepper CW and CCW
+# when passed to serial monitor
+
+try:
+    esp32.write("1".encode())
+    esp32.write("2".encode())
+    data = esp32.readline()
+
+    if data:
+        print(data)
+except Exception as e:
+    print(e)
+    esp32.close()
+
+
+# ----Autofocus ---- #
+
+# Edge detection class ?
 ddepth = cv2.CV_16S
+# Kernel, using convolution? 
 kernel_size = 3
+# window name for own gui? 
 window_name = "Autofocus Testing"
  
 #Camera Preamble 
@@ -22,8 +63,8 @@ camSet='nvarguscamerasrc !  video/x-raw(memory:NVMM), width=3264, height=2464, f
 cam=cv2.VideoCapture(camSet)
  
 #function deciding how to move the objective lens in the z-plane 
-def z_move(): 
-    distance = distance/2 
+def z_move(e_diff,reset_param): 
+    distance = distance / 2 
 
     if e_diff > 0:
         direction = 1
@@ -36,6 +77,7 @@ def reset():
     #move objective to initial position
     distance = 100              #total range of movement of the z-stage 
                                 #or more likely range over which focussing is possible
+    z_move()
 
 def autofocus():
     # Set the threshold for difference in contrast between image[n] and image[n-1]
@@ -68,7 +110,10 @@ def autofocus():
     watchdog_count = 0
 
     #direction variable on which way z-stage is moved
-    direction = 1               # 1 = upwards, 0 = downwards 
+    direction = 1               # 1 = upwards, 0 = downwards
+    dir = esp32.readline() #can get direction just by reading from serial monitor
+    if dir == '2':
+        
 
     while (e_diff < e_diff_threshold) & (energy < e_threshold): 
         
