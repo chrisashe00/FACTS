@@ -51,7 +51,7 @@ void stepZ(void *parameters){
 
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperZ.step(10);
+            myStepperZ.step(100);
             Serial.print("Stepping 5 steps CW \n");
             digitalWrite(ZSLP, LOW);
             break;
@@ -60,7 +60,7 @@ void stepZ(void *parameters){
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
             
-            myStepperZ.step(- 10);
+            myStepperZ.step(- 100);
             Serial.print("Stepping 5 steps CCW \n");
             digitalWrite(ZSLP, LOW);
             break;
@@ -101,9 +101,6 @@ void stepZ(void *parameters){
 
 
 void setup(){
-    
-    Serial.println("Running ESP32 Script to control electonics");
-
 
     pinMode(limeLedPin, OUTPUT);
     pinMode(blueLedPin,OUTPUT);
@@ -116,7 +113,8 @@ void setup(){
     pinMode(ZULT,OUTPUT);
 
     Serial.begin(115200); 
-    myStepperZ.setSpeed(20); // set the speed of the stepper motors to 60 rpm
+    Serial.println("Running ESP32 Script to control electonics");
+    myStepperZ.setSpeed(60); // set the speed of the stepper motors to 60 rpm
     myStepperX.setSpeed(60);
 
 // ---------------- Function Calls ------------ //
