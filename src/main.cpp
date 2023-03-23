@@ -57,9 +57,10 @@ void stepZ(void *parameters){
             break;
 
             case '2': 
-            vTaskDelay(10 / portTICK_PERIOD_MS);
             digitalWrite(ZSLP,HIGH);
-            myStepperZ.step(-10);
+            vTaskDelay(10 / portTICK_PERIOD_MS);
+            
+            myStepperZ.step(- 10);
             Serial.print("Stepping 5 steps CCW \n");
             digitalWrite(ZSLP, LOW);
             break;
@@ -70,6 +71,7 @@ void stepZ(void *parameters){
             vTaskDelay(10 / portTICK_PERIOD_MS);
             myStepperZ.step(5);
             Serial.print("Stepping 5 steps CW \n");
+            vTaskDelay(3000 / portTICK_PERIOD_MS);
             digitalWrite(ZSLP, LOW);
             break;
 
@@ -99,6 +101,8 @@ void stepZ(void *parameters){
 
 
 void setup(){
+    
+    Serial.println("Running ESP32 Script to control electonics");
 
 
     pinMode(limeLedPin, OUTPUT);
