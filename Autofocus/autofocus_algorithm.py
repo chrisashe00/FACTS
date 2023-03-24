@@ -152,5 +152,7 @@ def autofocus():
         watchdog_count += 1
 
 
+user_in = int(input('enter start to start the autofocus: '))
 
-
+if user_in == 'start':
+    autofocus()
