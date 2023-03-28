@@ -54,11 +54,19 @@ class MyWindow(QMainWindow):
         self.cam1_bri_slider.valueChanged.connect(self.adjust_left_camera_brightness)
         self.cam2_bri_slider.valueChanged.connect(self.adjust_right_camera_brightness)
         self.img1_bri_slider.valueChanged.connect(self.adjust_left_image_brightness)
+        self.img1_bri_slider.setMinimum(0)
+        self.img1_bri_slider.setMaximum(100)
         self.img2_bri_slider.valueChanged.connect(self.adjust_right_image_brightness)
+        self.img2_bri_slider.setMinimum(0)
+        self.img2_bri_slider.setMaximum(100)
         self.cam1_con_slider.valueChanged.connect(self.adjust_left_camera_contrast)
         self.cam2_con_slider.valueChanged.connect(self.adjust_right_camera_contrast)
         self.img1_con_slider.valueChanged.connect(self.adjust_imgcam1_contrast)
+        self.img1_con_slider.setMinimum(0)
+        self.img1_con_slider.setMaximum(100)
         self.img2_con_slider.valueChanged.connect(self.adjust_imgcam2_contrast)
+        self.img2_con_slider.setMinimum(0)
+        self.img2_con_slider.setMaximum(100)
         self.cam1_denoise.clicked.connect(self.toggle_left_camera_noise_reduction)
         self.cam2_denoise.clicked.connect(self.toggle_right_camera_noise_reduction)
         self.img1_denoise.clicked.connect(self.apply_left_image_noise_reduction)
@@ -124,17 +132,15 @@ class MyWindow(QMainWindow):
             pixmap = QPixmap.fromImage(qimage)
             self.imgcam1.setPixmap(pixmap)
 
-<<<<<<< HEAD
             #Save image to computer
             timestamp = time.strftime("%Y%m%d-%H%M%S")
             save_path = os.path.join(os.path.expanduser("~")), "Pictures", "CapturedImages", f"left_image_{timestamp}.png"
-=======
             # Save the image to the computer
             timestamp = time.strftime("%Y%m%d-%H%M%S")
             save_path = os.path.join(os.path.expanduser("~"), "Pictures", "CapturedImages", f"left_image_{timestamp}.png")
+            directory = os.path.join(os.path.expanduser("~"), "Pictures", "CapturedImages")
             if not os.path.exists(directory):
                     os.makedirs(directory)
->>>>>>> d92de75d8cd4286fa6c8fb694b5c3f8fcc96fb15
             cv2.imwrite(save_path, frame)
 
     @pyqtSlot()
@@ -147,20 +153,17 @@ class MyWindow(QMainWindow):
             pixmap = QPixmap.fromImage(qimage)
             self.imgcam2.setPixmap(pixmap)
 
-<<<<<<< HEAD
             #Save image to computer
             timestamp = time.strftime("%Y%m%d-%H%M%S")
             save_path = os.path.join(os.path.expanduser("~")), "Pictures", "CapturedImages", f"right_image_{timestamp}.png"
             print(frame.shape)
             print(save_path)
-=======
             # Save the image to the computer
             timestamp = time.strftime("%Y%m%d-%H%M%S")
             save_path = os.path.join(os.path.expanduser("~"), "Pictures", "CapturedImages", f"right_image_{timestamp}.png")
             directory = os.path.join(os.path.expanduser("~"), "Pictures", "CapturedImages")
             if not os.path.exists(directory):
                     os.makedirs(directory)
->>>>>>> d92de75d8cd4286fa6c8fb694b5c3f8fcc96fb15
             cv2.imwrite(save_path, frame)
 
     @pyqtSlot(int)
@@ -211,12 +214,13 @@ class MyWindow(QMainWindow):
     def apply_right_image_noise_reduction(self):
         self.imgcam2.setPixmap(apply_noise_reduction_to_pixmap(self.imgcam2.pixmap()))
 
-    def _adjust_image_brightness(self, label, value):
+    def _adjust_image_brightness(self, label, slider_value):
+        brightness = int((slider_value - 50) * 2) 
         pixmap = label.pixmap()
         if pixmap is not None:
             img = pixmap.toImage()
             np_image = qimage_to_np(img)
-            np_image = cv2.convertScaleAbs(np_image, alpha=1, beta=value)
+            np_image = cv2.convertScaleAbs(np_image, alpha=1, beta=brightness)
             img = np_to_qimage(np_image)
             pixmap = QPixmap.fromImage(img)
             label.setPixmap(pixmap)
@@ -228,14 +232,14 @@ class MyWindow(QMainWindow):
         contrast = value / 100.0
         img = pixmap.toImage()
         np_image = qimage_to_np(img)
-        lab_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2Lab)
-        l, a, b = cv2.split(lab_image)
-        l = l.astype('float32')
-        l = l * contrast
-        l = np.clip(l, 0, 100)
-        l = l.astype('uint8')
-        lab_image = cv2.merge([l, a, b])
-        np_image = cv2.cvtColor(lab_image, cv2.COLOR_Lab2BGR)
+        hsv_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv_image)
+        v = v.astype('float32')
+        v = v * contrast
+        v = np.clip(v, 0, 255)
+        v = v.astype('uint8')
+        hsv_image = cv2.merge([h, s, v])
+        np_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
         img = np_to_qimage(np_image)
         return QPixmap.fromImage(img)
 
