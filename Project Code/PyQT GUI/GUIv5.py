@@ -30,7 +30,9 @@ def apply_noise_reduction_to_pixmap(pixmap):
 
     img = pixmap.toImage()
     np_image = qimage_to_np(img)
+    np_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2GRAY)
     np_image = cv2.fastNlMeansDenoising(np_image, None, 10, 7, 21)
+    np_image = cv2.cvtColor(np_image, cv2.COLOR_GRAY2BGR)
     img = np_to_qimage(np_image)
 
     return QPixmap.fromImage(img)
@@ -199,7 +201,7 @@ class MyWindow(QMainWindow):
         if pixmap is not None:
             img = pixmap.toImage()
             np_image = qimage_to_np(img)
-            np_image = cv2.add(np_image, np.array([value, value, value]))
+            np_image = cv2.convertScaleAbs(np_image, alpha=1, beta=value)
             img = np_to_qimage(np_image)
             pixmap = QPixmap.fromImage(img)
             label.setPixmap(pixmap)
@@ -208,10 +210,17 @@ class MyWindow(QMainWindow):
         if pixmap is None:
             return None
 
-        contrast = value / 50.0
+        contrast = value / 100.0
         img = pixmap.toImage()
         np_image = qimage_to_np(img)
-        np_image = cv2.addWeighted(np_image, contrast, np_image, 0, 128 * (1 - contrast))
+        lab_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2Lab)
+        l, a, b = cv2.split(lab_image)
+        l = l.astype('float32')
+        l = l * contrast
+        l = np.clip(l, 0, 100)
+        l = l.astype('uint8')
+        lab_image = cv2.merge([l, a, b])
+        np_image = cv2.cvtColor(lab_image, cv2.COLOR_Lab2BGR)
         img = np_to_qimage(np_image)
         return QPixmap.fromImage(img)
 
