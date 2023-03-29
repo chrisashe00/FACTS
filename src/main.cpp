@@ -21,12 +21,13 @@ const int ZA1B = 27;
 const int ZB1A = 26;
 const int ZB1B = 25;
 const int ZSLP = 33;
+const int ZULT = 32; 
 
 const int blueLedPin = 12; // Blue LED
 const int limeLedPin = 13; // Lime LED
 
 const int stepsPerRevZ = 200; // Z stage: 1.8 degree step angle
-const int stepsPerRevXY = 20; // XY stage 18 degree step angle
+const int stepsPerRevXY = 200; // XY stage 18 degree step angle
 
 int player = 0;
 
@@ -46,9 +47,6 @@ void limeLED(void *parameters){
 void onConnect(){
     Serial.println("Connected.");
 
-         // Turn rumble on full intensity for 1 second
-
-
 }
 
 // ------------------ Z Stage Stepper function -------------- //
@@ -65,7 +63,7 @@ void stepZ(void *parameters){
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
             myStepperZ.step(1);
-            Serial.print("Stepping +1 step (UP)\n");
+            Serial.print("case 1\n");
             digitalWrite(ZSLP, LOW);
 
             break;
@@ -75,7 +73,7 @@ void stepZ(void *parameters){
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
             myStepperZ.step(-1);
-            Serial.print("Stepping -1 step (DOWN) \n");
+            Serial.print("case 2\n");
             digitalWrite(ZSLP, LOW);
 
             break;
@@ -85,7 +83,7 @@ void stepZ(void *parameters){
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
             myStepperZ.step(10);
-            Serial.print("Stepping 10 steps (UP) \n");
+            Serial.print("case 3\n");
             digitalWrite(ZSLP, LOW);
 
             break;
@@ -95,7 +93,7 @@ void stepZ(void *parameters){
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
             myStepperZ.step(- 10);
-            Serial.print("Stepping -10 steps (DOWN) \n");
+            Serial.print("case 4\n");
             digitalWrite(ZSLP, LOW);
 
             break;
@@ -105,7 +103,7 @@ void stepZ(void *parameters){
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
             myStepperZ.step(50);
-            Serial.print("Stepping 50 steps (UP) \n");
+            Serial.print("case 5\n");
             digitalWrite(ZSLP, LOW);
 
             break;
@@ -115,7 +113,7 @@ void stepZ(void *parameters){
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
             myStepperZ.step(- 50);
-            Serial.print("Stepping -50 steps (DOWN) \n");
+            Serial.print("case 6\n");
             digitalWrite(ZSLP, LOW);
 
             break;
@@ -184,7 +182,6 @@ void stepZPs3(void *paramaters){
         }
     }   
 }
-
 
 void stepX(void *paramaters){
     for (;;) {
@@ -269,7 +266,6 @@ void ledOnOff(void *parameters){
     }
 }
 
-// Timer function //
 
 
 
@@ -293,6 +289,9 @@ void setup(){
     pinMode(ZB1A,OUTPUT);
     pinMode(ZB1B,OUTPUT);
     pinMode(ZSLP, OUTPUT);
+    pinMode(ZULT, OUTPUT); 
+
+    digitalWrite(ZULT, LOW);
 
     myStepperZ.setSpeed(30); // set the speed of the stepper motors
     myStepperX.setSpeed(30);
@@ -331,14 +330,14 @@ void setup(){
     //     NULL
     // );
 
-    xTaskCreate(
-        ledOnOff,
-        "ledOnOff",
-        1000,
-        NULL,
-        1,
-        NULL
-    );
+    // xTaskCreate(
+    //     ledOnOff,
+    //     "ledOnOff",
+    //     1000,
+    //     NULL,
+    //     1,
+    //     NULL
+    // );
 
     xTaskCreate(
         stepZPs3,
