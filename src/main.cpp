@@ -1,6 +1,11 @@
 #include <Arduino.h>
 #include <Stepper.h>
 #include <Ps3Controller.h>
+#include <Wire.h>
+#include <Adafruit_MCP4725.h>
+#include <Wire.h>
+#include <BluetoothSerial.h>
+#include <usbhid.h>
  
 // ---------------- Pin Assignment ------------ //
 
@@ -31,6 +36,9 @@ const int stepsPerRevXY = 200; // XY stage 18 degree step angle
 
 int player = 0;
 
+bool ps3Connected = false;
+
+
 
 // ---------------- Stepper functions ------------ //
 
@@ -49,6 +57,35 @@ void onConnect(){
 
 }
 
+void reconnectController(void *parameters) {
+    for(;;){
+        if (Ps3.isConnected()){
+            vTaskDelay(10 / portTICK_PERIOD_MS);
+            taskYIELD();
+    }
+
+    else if (!ps3Connected){    
+        Ps3.attachOnConnect(onConnect);
+        Ps3.begin("C0:49:EF:D3:6C:D6");
+
+        Serial.println("Ready.");
+        Serial.print("Setting LEDs to player "); 
+        Serial.println(player, DEC);
+        Ps3.setPlayer(player);
+
+        player = 1;
+        ps3Connected = true; 
+        }
+
+    else{
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+        taskYIELD();
+    }
+    }
+
+
+}
+
 // ------------------ Z Stage Stepper function -------------- //
 void stepZ(void *parameters){
     for (;;) {
@@ -62,8 +99,9 @@ void stepZ(void *parameters){
 
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperZ.step(1);
             Serial.print("case 1\n");
+            myStepperZ.step(1);
+            Serial.print("complete\n");
             digitalWrite(ZSLP, LOW);
 
             break;
@@ -72,8 +110,9 @@ void stepZ(void *parameters){
 
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperZ.step(-1);
             Serial.print("case 2\n");
+            myStepperZ.step(-1);
+            Serial.print("complete\n");
             digitalWrite(ZSLP, LOW);
 
             break;
@@ -82,8 +121,9 @@ void stepZ(void *parameters){
 
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperZ.step(10);
             Serial.print("case 3\n");
+            myStepperZ.step(10);
+            Serial.print("complete\n");
             digitalWrite(ZSLP, LOW);
 
             break;
@@ -92,8 +132,9 @@ void stepZ(void *parameters){
 
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperZ.step(- 10);
             Serial.print("case 4\n");
+            myStepperZ.step(- 10);
+            Serial.print("complete\n");
             digitalWrite(ZSLP, LOW);
 
             break;
@@ -101,9 +142,10 @@ void stepZ(void *parameters){
             case '5': 
 
             digitalWrite(ZSLP,HIGH);
+            Serial.print("case 5\n");
             vTaskDelay(10 / portTICK_PERIOD_MS);
             myStepperZ.step(50);
-            Serial.print("case 5\n");
+            Serial.print("complete\n");
             digitalWrite(ZSLP, LOW);
 
             break;
@@ -112,8 +154,9 @@ void stepZ(void *parameters){
 
             digitalWrite(ZSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperZ.step(- 50);
             Serial.print("case 6\n");
+            myStepperZ.step(- 50);
+            Serial.print("complete\n");
             digitalWrite(ZSLP, LOW);
 
             break;
@@ -243,19 +286,29 @@ void ledOnOff(void *parameters){
     for(;;){
         if( Ps3.data.button.up ){
             Serial.println("Pressing the up button");
-            digitalWrite(limeLedPin,HIGH);
             digitalWrite(blueLedPin, HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperZ.step(20);
             Serial.print("LED On \n");
         }
         
         if( Ps3.data.button.down ){
             Serial.println("Pressing the down button");
-            digitalWrite(limeLedPin,LOW);
             digitalWrite(blueLedPin, LOW);
             vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperZ.step(-20);
+            Serial.print("LED Off \n");
+        }
+
+        if( Ps3.data.button.right ){
+            Serial.println("Pressing the right button");
+            digitalWrite(limeLedPin,LOW);
+            vTaskDelay(10 / portTICK_PERIOD_MS);
+            Serial.print("LED Off \n");
+        }
+
+        if( Ps3.data.button.left ){
+            Serial.println("Pressing the left button");
+            digitalWrite(limeLedPin,HIGH);
+            vTaskDelay(10 / portTICK_PERIOD_MS);
             Serial.print("LED Off \n");
         }
 
@@ -271,15 +324,15 @@ void ledOnOff(void *parameters){
 
 void setup(){
 
-    Ps3.attachOnConnect(onConnect);
-    Ps3.begin("C0:49:EF:D3:6C:D6");
+    // Ps3.attachOnConnect(onConnect);
+    // Ps3.begin("C0:49:EF:D3:6C:D6");
 
-    Serial.println("Ready.");
-    Serial.print("Setting LEDs to player "); 
-    Serial.println(player, DEC);
-    Ps3.setPlayer(player);
+    // Serial.println("Ready.");
+    // Serial.print("Setting LEDs to player "); 
+    // Serial.println(player, DEC);
+    // Ps3.setPlayer(player);
 
-    player = 1;
+    // player = 1;
 
     pinMode(limeLedPin, OUTPUT);
     pinMode(blueLedPin,OUTPUT);
@@ -303,14 +356,14 @@ void setup(){
 
 // ---------------- Create Tasks ------------ //
 
-    // xTaskCreate(
-    //     stepZ,
-    //     "stepZ",
-    //     2048,
-    //     NULL,
-    //     1,
-    //     NULL
-    // );
+    xTaskCreate(
+        stepZ,
+        "stepZ",
+        2048,
+        NULL,
+        1,
+        NULL
+    );
 
     // xTaskCreate(
     //     stepX,
@@ -330,14 +383,14 @@ void setup(){
     //     NULL
     // );
 
-    // xTaskCreate(
-    //     ledOnOff,
-    //     "ledOnOff",
-    //     1000,
-    //     NULL,
-    //     1,
-    //     NULL
-    // );
+    xTaskCreate(
+        ledOnOff,
+        "ledOnOff",
+        1000,
+        NULL,
+        1,
+        NULL
+    );
 
     xTaskCreate(
         stepZPs3,
@@ -346,6 +399,16 @@ void setup(){
         NULL,
         1,
         NULL
+    );
+
+    xTaskCreatePinnedToCore(
+        reconnectController,      // Task function
+        "reconnectController",       // Task name
+        4096,              // Stack size
+        NULL,              // Task parameters
+        1,                 // Task priority
+        NULL,      // Task handle
+        0                  // Core ID (0 or 1)
     );
 }
 
