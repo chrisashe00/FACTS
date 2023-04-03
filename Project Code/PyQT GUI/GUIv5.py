@@ -215,19 +215,19 @@ class MyWindow(QMainWindow):
         self.imgcam2.setPixmap(apply_noise_reduction_to_pixmap(self.imgcam2.pixmap()))
 
     def _adjust_image_brightness(self, label, slider_value):
-        brightness = int((slider_value - 50) * 2)
+        brightness = int((slider_value - 50) * 2.55)
         pixmap = label.pixmap()
         if pixmap is not None:
             img = pixmap.toImage()
             np_image = qimage_to_np(img)
-            adjusted_image = cv2.addWeighted(np_image, 1, np.zeros(np_image.shape, np_image.dtype), 0, brightness)
+            adjusted_image = np_image + brightness
             adjusted_image = np.clip(adjusted_image, 0, 255)
             img = np_to_qimage(adjusted_image)
             pixmap = QPixmap.fromImage(img)
             label.setPixmap(pixmap)
 
-    def _adjust_image_contrast(self, label, slider_value):
-        contrast = (slider_value - 50) / 50
+    def apply_contrast_to_pixmap(self, label, slider_value):
+        contrast = (slider_value / 50)
         pixmap = label.pixmap()
         if pixmap is not None:
             img = pixmap.toImage()
