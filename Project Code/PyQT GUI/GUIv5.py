@@ -215,33 +215,35 @@ class MyWindow(QMainWindow):
         self.imgcam2.setPixmap(apply_noise_reduction_to_pixmap(self.imgcam2.pixmap()))
 
     def _adjust_image_brightness(self, label, slider_value):
-        brightness = int((slider_value - 50) * 2) 
+        brightness = int((slider_value - 50) * 2.55)
         pixmap = label.pixmap()
         if pixmap is not None:
             img = pixmap.toImage()
             np_image = qimage_to_np(img)
-            np_image = cv2.convertScaleAbs(np_image, alpha=1, beta=brightness)
-            img = np_to_qimage(np_image)
+            adjusted_image = np_image + brightness
+            adjusted_image = np.clip(adjusted_image, 0, 255)
+            img = np_to_qimage(adjusted_image)
             pixmap = QPixmap.fromImage(img)
             label.setPixmap(pixmap)
-    
-    def apply_contrast_to_pixmap(self, pixmap, value):
-        if pixmap is None:
-            return None
 
-        contrast = value / 100.0
-        img = pixmap.toImage()
-        np_image = qimage_to_np(img)
-        hsv_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2HSV)
-        h, s, v = cv2.split(hsv_image)
-        v = v.astype('float32')
-        v = v * contrast
-        v = np.clip(v, 0, 255)
-        v = v.astype('uint8')
-        hsv_image = cv2.merge([h, s, v])
-        np_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
-        img = np_to_qimage(np_image)
-        return QPixmap.fromImage(img)
+    def apply_contrast_to_pixmap(self, label, slider_value):
+        contrast = (slider_value / 50)
+        pixmap = label.pixmap()
+        if pixmap is not None:
+            img = pixmap.toImage()
+            np_image = qimage_to_np(img)
+            # Convert the image to float32 to avoid overflow when scaling pixel values
+            np_image_float32 = np_image.astype(np.float32)
+            # Calculate the mean pixel value of the image
+            mean_pixel_value = np.mean(np_image_float32)
+            # Adjust the contrast by scaling the pixel values relative to the mean pixel value
+            adjusted_image = (np_image_float32 - mean_pixel_value) * contrast + mean_pixel_value
+            # Clip the pixel values to the valid range [0, 255] and convert back to uint8
+            adjusted_image = np.clip(adjusted_image, 0, 255).astype(np.uint8)
+            img = np_to_qimage(adjusted_image)
+            pixmap = QPixmap.fromImage(img)
+            label.setPixmap(pixmap)
+
 
 class CSI_Camera(QObject):
     frame_received = pyqtSignal(QImage)
