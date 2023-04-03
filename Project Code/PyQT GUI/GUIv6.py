@@ -15,15 +15,14 @@ from qtmodern.styles import dark
 from qtmodern.windows import ModernWindow
 
 #Helper Functions
-def qimage_to_np(qimage):
-        buffer = qimage.bits().asstring(qimage.byteCount())
-        np_image = np.frombuffer(buffer, np.uint8).reshape((qimage.height(), qimage.width(), -1))
-        return np_image
+def qimage_to_np(img: QImage):
+    # Properly handling the data type of the numpy array
+    return np.array(img.bits().asarray(img.width() * img.height() * img.depth() // 8)).reshape(img.height(), img.width(), img.depth() // 8).astype(np.uint8)
 
-def np_to_qimage(np_image):
-        height, width, channel = np_image.shape
-        bytes_per_line = 3 * width
-        return QImage(np_image.data, width, height, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
+def np_to_qimage(arr: np.ndarray) -> QImage:
+    # Properly handling the data type of the numpy array
+    return QImage(arr.astype(np.uint8).data, arr.shape[1], arr.shape[0], arr.strides[0], QImage.Format_RGB888)
+
 
 def apply_noise_reduction_to_pixmap(pixmap):
     if pixmap is None:
