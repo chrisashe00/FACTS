@@ -9,13 +9,13 @@
  
 // ---------------- Pin Assignment ------------ //
 
-const int XA1A = 15; //X Stage Stepper Pins
-const int XA1B = 2;
-const int XB1A = 4;
-const int XB1B = 5;
-const int XSLP = 18;
+const int XA1A = 5; //X Stage Stepper Pins
+const int XA1B = 18;
+const int XB1A = 19;
+const int XB1B = 21;
+const int XSLP = 22;
 
-const int YA1A = 33; //Y Stage Stepper Pins
+const int YA1A = 2; //Y Stage Stepper Pins
 const int YA1B = 32;
 const int YB1A = 35;
 const int YB1B = 34;
@@ -32,12 +32,14 @@ const int blueLedPin = 12; // Blue LED
 const int limeLedPin = 13; // Lime LED
 
 const int stepsPerRevZ = 200; // Z stage: 1.8 degree step angle
-const int stepsPerRevXY = 200; // XY stage 18 degree step angle
+const int stepsPerRevXY = 20; // XY stage 18 degree step angle
 
 int player = 0;
 
 bool ps3Connected = false;
-
+bool zLock = false;
+bool xLock = false;
+bool yLock = false;
 
 
 // ---------------- Stepper functions ------------ //
@@ -101,6 +103,10 @@ void stepZ(void *parameters){
             vTaskDelay(10 / portTICK_PERIOD_MS);
             Serial.print("case 1\n");
             myStepperZ.step(1);
+             while (myStepperZ.isRunning()) {
+            // Wait until the stepper has finished moving
+            vTaskDelay(1 / portTICK_PERIOD_MS);
+            }
             Serial.print("complete\n");
             digitalWrite(ZSLP, LOW);
 
@@ -181,74 +187,124 @@ void stepZ(void *parameters){
 
 void stepZPs3(void *paramaters){
     for (;;) {
+            if( Ps3.data.button.r1 && zLock == false){
+                zLock = true;
+                Serial.println("Pressing start \n");
+                digitalWrite(ZSLP,HIGH);
+                vTaskDelay(10 / portTICK_PERIOD_MS);
+                myStepperZ.step(stepsPerRevZ);
+                Serial.print("Stepping Z +5 steps \n");
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+                digitalWrite(ZSLP,LOW);
 
-        if( Ps3.data.button.r1 ){
-            Serial.println("Pressing the right bumper \n");
+            }
+            if( Ps3.data.button.start && zLock == false){
+                zLock = true;
+                Serial.println("Pressing the right bumper \n");
+                digitalWrite(ZSLP,HIGH);
+                vTaskDelay(10 / portTICK_PERIOD_MS);
+                myStepperZ.step(+ 4 * stepsPerRevZ);
+                Serial.print("Stepping Z +5 revs\n");
+                vTaskDelay(10 / portTICK_PERIOD_MS);
+                digitalWrite(ZSLP,LOW);
 
-            digitalWrite(ZSLP,HIGH);
-            vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperZ.step(5);
-            Serial.print("Stepping Z +5 steps \n");
-            digitalWrite(ZSLP,LOW);
-        }
-        
-        if( Ps3.data.button.l1 ){
-            Serial.println("Pressing the left bumper \n");
-            digitalWrite(ZSLP,HIGH);
-            vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperZ.step(-5);
-            Serial.print("Stepping Z -5 steps \n");
-            digitalWrite(ZSLP,LOW);
-        }
+            }
+            if( Ps3.data.button.select && zLock == false){
+                zLock = true;
+                Serial.println("Pressing select \n");
+                digitalWrite(ZSLP,HIGH);
+                vTaskDelay(10 / portTICK_PERIOD_MS);
+                myStepperZ.step(- 4 * stepsPerRevZ);
+                Serial.print("Stepping Z -5 revs \n");
+                vTaskDelay(10 / portTICK_PERIOD_MS);
+                digitalWrite(ZSLP,LOW);
 
-        if( Ps3.data.button.triangle ){
-            Serial.println("Pressing the triangle \n");
-            digitalWrite(ZSLP,HIGH);
-            vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperZ.step(+1);
-            Serial.print("Stepping Z +1 steps \n");
-            digitalWrite(ZSLP,LOW);
-        }
+            }
+            if( Ps3.data.button.l1 && zLock == false){
+                zLock = true;
+                Serial.println("Pressing the left bumper \n");
+                digitalWrite(ZSLP,HIGH);
+                vTaskDelay(50 / portTICK_PERIOD_MS);
+                myStepperZ.step(-stepsPerRevZ);
+                Serial.print("Stepping Z -5 steps \n");
+                digitalWrite(ZSLP,LOW);
+            }
 
-        if( Ps3.data.button.cross ){
-            Serial.println("Pressing the cross \n");
-            digitalWrite(ZSLP,HIGH);
-            vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperZ.step(-1);
-            Serial.print("Stepping Z -1 steps \n");
-            digitalWrite(ZSLP,LOW);
-        }
+            if( Ps3.data.button.triangle && zLock == false ){
+                zLock = true;
+                Serial.println("Pressing the triangle \n");
+                digitalWrite(ZSLP,HIGH);
+                vTaskDelay(10 / portTICK_PERIOD_MS);
+                myStepperZ.step(+1);
+                Serial.print("Stepping Z +1 steps \n");
+                digitalWrite(ZSLP,LOW);
+            }
 
-        else{
-            vTaskDelay(10 /portTICK_PERIOD_MS);
-            taskYIELD();
+            if( Ps3.data.button.cross && zLock == false ){
+                zLock = true;
+                Serial.println("Pressing the cross \n");
+                digitalWrite(ZSLP,HIGH);
+                vTaskDelay(10 / portTICK_PERIOD_MS);
+                myStepperZ.step(-1);
+                Serial.print("Stepping Z -1 steps \n");
+                digitalWrite(ZSLP,LOW);
+            }
+
+            if( Ps3.data.button.l2 && zLock == false){
+                zLock = true;
+                Serial.println("Pressing the right bumper \n");
+                digitalWrite(ZSLP,HIGH);
+                vTaskDelay(10 / portTICK_PERIOD_MS);
+                myStepperZ.step(-50);
+                Serial.print("Stepping Z -50 steps\n");
+                vTaskDelay(10/ portTICK_PERIOD_MS);
+                digitalWrite(ZSLP,LOW);
+            }
+
+            if( Ps3.data.button.r2 && zLock == false){
+                zLock = true;
+                Serial.println("Pressing the right bumper \n");
+                digitalWrite(ZSLP,HIGH);
+                vTaskDelay(10 / portTICK_PERIOD_MS);
+                myStepperZ.step(50);
+                Serial.print("Stepping Z +50 steps\n");
+                vTaskDelay(10 / portTICK_PERIOD_MS);
+                digitalWrite(ZSLP,LOW);
+            }
+            else{
+                vTaskDelay(1000 /portTICK_PERIOD_MS);
+
+                taskYIELD();
+                zLock = false;
+            }
         }
     }   
-}
 
 void stepX(void *paramaters){
     for (;;) {
-
-        if( Ps3.data.button.circle ){
+        if( Ps3.data.button.circle && xLock == false ){
+            xLock = true;
             Serial.println("Pressing the circle button");
             digitalWrite(XSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperX.step(20);
+            myStepperX.step(10);
             Serial.print("Stepping X 20 steps \n");
             digitalWrite(XSLP,LOW);
         }
         
-        if( Ps3.data.button.square ){
+        if( Ps3.data.button.square && xLock == false ){
+            xLock = true;
             Serial.println("Pressing the square button");
             digitalWrite(XSLP,HIGH);
             vTaskDelay(10 / portTICK_PERIOD_MS);
-            myStepperX.step(-20);
+            myStepperX.step(-10);
             Serial.print("Stepping X -20 steps \n");
             digitalWrite(XSLP,LOW);
         }
 
         else{
-            vTaskDelay(10 /portTICK_PERIOD_MS);
+            xLock = false;
+            vTaskDelay(1000 /portTICK_PERIOD_MS);
             taskYIELD();
         }
     }   
@@ -277,6 +333,7 @@ void stepY(void *paramaters){
 
         else{
             vTaskDelay(10 /portTICK_PERIOD_MS);
+
             taskYIELD();
         }
     }   
@@ -344,9 +401,16 @@ void setup(){
     pinMode(ZSLP, OUTPUT);
     pinMode(ZULT, OUTPUT); 
 
-    digitalWrite(ZULT, LOW);
+    pinMode(XA1A,OUTPUT);
+    pinMode(XA1B,OUTPUT);
+    pinMode(XB1A,OUTPUT);
+    pinMode(XB1B,OUTPUT);
+    pinMode(XSLP, OUTPUT);
 
-    myStepperZ.setSpeed(30); // set the speed of the stepper motors
+    digitalWrite(ZULT, LOW);
+    digitalWrite(ZSLP,LOW);
+
+    myStepperZ.setSpeed(15); // set the speed of the stepper motors
     myStepperX.setSpeed(30);
     myStepperY.setSpeed(30);
 
@@ -365,14 +429,14 @@ void setup(){
         NULL
     );
 
-    // xTaskCreate(
-    //     stepX,
-    //     "stepX",
-    //     2048,
-    //     NULL,
-    //     1,
-    //     NULL
-    // );
+    xTaskCreate(
+        stepX,
+        "stepX",
+        2048,
+        NULL,
+        1,
+        NULL
+    );
 
     // xTaskCreate(
     //     stepY,
