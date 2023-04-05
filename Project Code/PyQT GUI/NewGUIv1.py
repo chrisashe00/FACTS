@@ -41,9 +41,9 @@ class MyWindow(QMainWindow):
         self.ip_off.clicked.connect(self.close_image_processing_window)
 
         # Set the stretch factors for the bottom horizontal layout
-        self.bottomHBoxLayout.setStretch(0, 2)  # First image label
-        self.bottomHBoxLayout.setStretch(1, 1)  # Second image label
-        self.bottomHBoxLayout.setStretch(2, 2)  # Group box
+        self.horizontalLayout_2.setStretch(0, 2)  # First image label
+        self.horizontalLayout_2.setStretch(1, 1)  # Group Box
+        self.horizontalLayout_2.setStretch(2, 2)  # Second Image label
         
         # Initialize camera instances
         self.left_camera = CSI_Camera()
