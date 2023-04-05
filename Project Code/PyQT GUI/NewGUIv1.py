@@ -25,7 +25,7 @@ def np_to_qimage(arr: np.ndarray) -> QImage:
 class MyWindow(QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
-        loadUi('New_GUI', self)
+        loadUi('nuiv1.ui', self)
         self.show()
 
         # Connect buttons to their respective functions
