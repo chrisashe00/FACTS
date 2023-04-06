@@ -14,15 +14,13 @@ from PyQt5.uic import loadUi
 from qtmodern.styles import dark
 from qtmodern.windows import ModernWindow
 
-#Helper Functions
-def qimage_to_np(img: QImage):
-    # Properly handling the data type of the numpy array
-    return np.array(img.bits().asarray(img.width() * img.height() * img.depth() // 8)).reshape(img.height(), img.width(), img.depth() // 8).astype(np.uint8)
+def qimage_to_np(img):
+    img_array = np.array(img.constBits()).reshape(img.height(), img.width(), 4)
+    return cv2.cvtColor(img_array, cv2.COLOR_RGBA2BGR)
 
-def np_to_qimage(arr: np.ndarray) -> QImage:
-    # Properly handling the data type of the numpy array
-    return QImage(arr.astype(np.uint8).data, arr.shape[1], arr.shape[0], arr.strides[0], QImage.Format_RGB888)
-
+def np_to_qimage(img):
+    height, width, _ = img.shape
+    return QImage(cv2.cvtColor(img, cv2.COLOR_BGR2RGB).data, width, height, QImage.Format_RGB888)
 
 def apply_noise_reduction_to_pixmap(pixmap):
     if pixmap is None:
@@ -121,12 +119,12 @@ class MyWindow(QMainWindow):
         pixmap = QPixmap.fromImage(qimage)
         self.camfeed2.setPixmap(pixmap)
 
-    @pyqtSlot()
     def capture_left_camera_image(self):
         grabbed, frame = self.left_camera.read()
         if grabbed:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+            self.imgCam1_np = frame.copy()  # Store the NumPy array
             qimage = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format_RGB888).rgbSwapped()
             pixmap = QPixmap.fromImage(qimage)
             self.imgcam1.setPixmap(pixmap)
@@ -142,12 +140,12 @@ class MyWindow(QMainWindow):
                     os.makedirs(directory)
             cv2.imwrite(save_path, frame)
 
-    @pyqtSlot()
     def capture_right_camera_image(self):
         grabbed, frame = self.right_camera.read()
         if grabbed:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+            self.imgCam2_np = frame.copy()  # Store the NumPy array
             qimage = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format_RGB888).rgbSwapped()
             pixmap = QPixmap.fromImage(qimage)
             self.imgcam2.setPixmap(pixmap)
@@ -174,29 +172,13 @@ class MyWindow(QMainWindow):
         self.right_camera.set_brightness(value)
 
     @pyqtSlot(int)
-    def adjust_left_image_brightness(self, value):
-        self._adjust_image_brightness(self.imgcam1, value)
-
-    @pyqtSlot(int)
-    def adjust_right_image_brightness(self, value):
-        self._adjust_image_brightness(self.imgcam2, value)
-    
-    @pyqtSlot(int)
     def adjust_left_camera_contrast(self, value):
         self.left_camera.set_contrast(value)
 
     @pyqtSlot(int)
     def adjust_right_camera_contrast(self, value):
         self.right_camera.set_contrast(value)
-    
-    @pyqtSlot(int)
-    def adjust_imgcam1_contrast(self, value):
-        self.imgcam1.setPixmap(self.apply_contrast_to_pixmap(self.imgcam1.pixmap(), value))
-
-    @pyqtSlot(int)
-    def adjust_imgcam2_contrast(self, value):
-        self.imgcam2.setPixmap(self.apply_contrast_to_pixmap(self.imgcam2.pixmap(), value))
-    
+       
     @pyqtSlot()
     def toggle_left_camera_noise_reduction(self):
         self.left_camera_noise_reduction = not self.left_camera_noise_reduction
@@ -213,36 +195,43 @@ class MyWindow(QMainWindow):
     def apply_right_image_noise_reduction(self):
         self.imgcam2.setPixmap(apply_noise_reduction_to_pixmap(self.imgcam2.pixmap()))
 
-    def _adjust_image_brightness(self, label, slider_value):
-        brightness = int((slider_value - 50) * 2.55)
-        pixmap = label.pixmap()
-        if pixmap is not None:
-            img = pixmap.toImage()
-            np_image = qimage_to_np(img)
-            adjusted_image = np_image + brightness
-            adjusted_image = np.clip(adjusted_image, 0, 255)  # Clip the pixel values to the valid range [0, 255]
-            img = np_to_qimage(adjusted_image)
-            pixmap = QPixmap.fromImage(img)
-            label.setPixmap(pixmap)
+    @pyqtSlot(int)
+    def adjust_left_image_brightness(self, value):
+        normalised_value = value / 100
+        self._adjust_image_brightness(self.imgCam1_np, normalised_value)
 
-    def apply_contrast_to_pixmap(self, label, slider_value):
-        contrast = (slider_value / 50)
-        pixmap = label.pixmap()
-        if pixmap is not None:
-            img = pixmap.toImage()
-            np_image = qimage_to_np(img)
-            # Convert the image to float32 to avoid overflow when scaling pixel values
-            np_image_float32 = np_image.astype(np.float32)
-            # Calculate the mean pixel value of the image
-            mean_pixel_value = np.mean(np_image_float32)
-            # Adjust the contrast by scaling the pixel values relative to the mean pixel value
-            adjusted_image = (np_image_float32 - mean_pixel_value) * contrast + mean_pixel_value
-            # Clip the pixel values to the valid range [0, 255] and convert back to uint8
-            adjusted_image = np.clip(adjusted_image, 0, 255).astype(np.uint8)
-            img = np_to_qimage(adjusted_image)
-            pixmap = QPixmap.fromImage(img)
-            label.setPixmap(pixmap)
+    @pyqtSlot(int)
+    def adjust_right_image_brightness(self, value):
+        normalised_value = value / 100
+        self._adjust_image_brightness(self.imgCam2_np, normalised_value)
 
+    @pyqtSlot(int)
+    def adjust_imgcam1_contrast(self, value):
+        imgCam1_contrast_np = self.apply_contrast_to_np_array(self.imgCam1_np, value)
+        imgCam1_contrast_QImage = np_to_qimage(imgCam1_contrast_np)
+        imgCam1_contrast_pixmap = QPixmap.fromImage(imgCam1_contrast_QImage)
+        self.imgcam1.setPixmap(imgCam1_contrast_pixmap)
+
+    @pyqtSlot(int)
+    def adjust_imgcam2_contrast(self, value):
+        imgCam2_contrast_np = self.apply_contrast_to_np_array(self.imgCam2_np, value)
+        imgCam2_contrast_QImage = np_to_qimage(imgCam2_contrast_np)
+        imgCam2_contrast_pixmap = QPixmap.fromImage(imgCam2_contrast_QImage)
+        self.imgcam2.setPixmap(imgCam2_contrast_pixmap)
+
+    def _adjust_image_brightness(self, np_image, value):
+        np_image = cv2.add(np_image, np.array([value, value, value]))
+        img = np_to_qimage(np_image)
+        pixmap = QPixmap.fromImage(img)
+        self.imgcam1.setPixmap(pixmap)
+
+    def apply_contrast_to_np_array(self, np_image, value):
+        if np_image is None:
+            return None
+
+        contrast = value / 50.0
+        np_image = cv2.addWeighted(np_image, contrast, np_image, 0, 128 * (1 - contrast))
+        return np_image
 
 class CSI_Camera(QObject):
     frame_received = pyqtSignal(QImage)
