@@ -26,10 +26,10 @@ def draw_scale_bar(image, pixels_per_unit, bar_length_units, bar_thickness, posi
     x, y = position
     cv2.rectangle(image, (x, y), (x + bar_length_pixels, y - bar_thickness), color, -1)
     if label:
-        text = f"{bar_length_units} units"
+        micrometers = int(bar_length_units * 10)  # Convert units to micrometers
+        text = f"{micrometers} µm"
         (text_width, text_height), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, 1)
         cv2.putText(image, text, (x + (bar_length_pixels - text_width) // 2, y - bar_thickness - 10), cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA)
-
 
 #GUI Window Class
 class MyWindow(QMainWindow):
@@ -97,9 +97,9 @@ class MyWindow(QMainWindow):
         np_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2GRAY)
         np_image = cv2.cvtColor(np_image, cv2.COLOR_GRAY2BGR)
         
-        # Add scale bar to the image
-        pixels_per_unit = 0.0000606060606061  # This should be replaced with the actual conversion factor
-        draw_scale_bar(np_image, pixels_per_unit, 50, 5, (50, 500))
+        pixels_per_unit = 165  # This is now in pixels per 1 mm
+        draw_scale_bar(np_image, pixels_per_unit, 2 , 5, (50, 500))
+
 
         qimage = np_to_qimage(np_image)
         pixmap = QPixmap.fromImage(qimage)
@@ -111,9 +111,9 @@ class MyWindow(QMainWindow):
         np_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2GRAY)
         np_image = cv2.cvtColor(np_image, cv2.COLOR_GRAY2BGR)
         
-        # Add scale bar to the image
-        pixels_per_unit = 0.0000606060606061  # This should be replaced with the actual conversion factor
-        draw_scale_bar(np_image, pixels_per_unit, 50, 5, (50, 500))
+        pixels_per_unit = 165  # This is now in pixels per 1 mm
+        draw_scale_bar(np_image, pixels_per_unit, 2 , 5, (50, 500))
+
 
         qimage = np_to_qimage(np_image)
         pixmap = QPixmap.fromImage(qimage)
