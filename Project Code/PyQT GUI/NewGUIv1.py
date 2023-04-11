@@ -25,7 +25,7 @@ def np_to_qimage(arr: np.ndarray) -> QImage:
 class MyWindow(QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
-        loadUi('New_GUI', self)
+        loadUi('nuiv4.ui', self)
         self.show()
 
         # Connect buttons to their respective functions
@@ -37,39 +37,50 @@ class MyWindow(QMainWindow):
         self.img2_on.clicked.connect(self.capture_right_camera_image)
         self.img1_off.clicked.connect(self.clear_left_image)
         self.img2_off.clicked.connect(self.clear_right_image)
-        self.ip_on.clicked.connect(self.open_image_processing_window)
-        self.ip_off.clicked.connect(self.close_image_processing_window)
+        self.colour_on.clicked.connect(self.update_camera_feed_colour)
+        self.grey_on.clicked.connect(self.update_camera_feed_greyscale)
 
         # Set the stretch factors for the bottom horizontal layout
         self.horizontalLayout_2.setStretch(0, 2)  # First image label
         self.horizontalLayout_2.setStretch(1, 1)  # Group Box
         self.horizontalLayout_2.setStretch(2, 2)  # Second Image label
         
-        # Initialize camera instances
+        # Initialize camera variables
         self.left_camera = CSI_Camera()
         self.right_camera = CSI_Camera()
+        self.left_camera_running = False
+        self.right_camera_running = False
+        self.left_camera_greyscale = False
+        self.right_camera_greyscale = False
 
     def stop_left_camera(self):
-        self.left_camera.stop()
-        self.left_camera.release()
-        self.camfeed1.setPixmap(QPixmap())
+        if self.left_camera_running:
+            self.left_camera.stop()
+            self.left_camera.release()
+            self.camfeed1.setPixmap(QPixmap())
+            self.left_camera_running = False
 
     def start_left_camera(self):
-        self.left_camera.reinitialize(gstreamer_pipeline(sensor_id=0, capture_width=1280, capture_height=720, flip_method=2, display_width=960, display_height=540))
-        self.left_camera.start()
-        self.left_camera.frame_received.connect(self.update_left_camera_feed)
+        if not self.left_camera_running:
+            self.left_camera.open(gstreamer_pipeline(sensor_id=0, capture_width=1280, capture_height=720, flip_method=2, display_width=960, display_height=540))
+            self.left_camera.start()
+            self.left_camera.frame_received.connect(self.update_left_camera_feed)
+            self.left_camera_running = True
 
     def start_right_camera(self):
-        self.right_camera.reinitialize(gstreamer_pipeline(sensor_id=1, capture_width=1280, capture_height=720, flip_method=2, display_width=960, display_height=540))
-        self.right_camera.start()
-        self.right_camera.frame_received.connect(self.update_right_camera_feed)
-
+        if not self.right_camera_running:
+            self.right_camera.open(gstreamer_pipeline(sensor_id=1, capture_width=1280, capture_height=720, flip_method=2, display_width=960, display_height=540))
+            self.right_camera.start()
+            self.right_camera.frame_received.connect(self.update_right_camera_feed)
+            self.right_camera_running = True
 
     def stop_right_camera(self):
-        self.right_camera.stop()
-        self.right_camera.release()
-        self.camfeed2.setPixmap(QPixmap())
-    
+        if self.right_camera_running:
+            self.right_camera.stop()
+            self.right_camera.release()
+            self.camfeed2.setPixmap(QPixmap())
+            self.right_camera_running = False
+
     @pyqtSlot(QImage)
     def update_left_camera_feed(self, qimage):
         np_image = qimage_to_np(qimage)
@@ -123,7 +134,7 @@ class MyWindow(QMainWindow):
             if not os.path.exists(directory):
                 os.makedirs(directory)
             cv2.imwrite(save_path, frame)
-   
+
     @pyqtSlot()
     def clear_left_image(self):
         self.imgcam1.clear()
@@ -132,90 +143,48 @@ class MyWindow(QMainWindow):
     def clear_right_image(self):
         self.imgcam2.clear()
 
-    def open_image_processing_window(self):
-        # Retrieve images from imgcam1 and imgcam2 labels
-        pixmap1 = self.imgcam1.pixmap()
-        pixmap2 = self.imgcam2.pixmap()
+    @pyqtSlot(QImage)
+    def update_left_camera_feed_colour(self, qimage):
+        pixmap = QPixmap.fromImage(qimage)
+        self.camfeed1.setPixmap(pixmap)
 
-        if pixmap1 is None or pixmap2 is None:
-            print("Both images must be captured before opening the image processing window.")
+    @pyqtSlot(QImage)
+    def update_right_camera_feed_colour(self, qimage):
+        pixmap = QPixmap.fromImage(qimage)
+        self.camfeed2.setPixmap(pixmap)
+    
+    @pyqtSlot()
+    def update_camera_feed_colour(self):
+        if not self.left_camera_greyscale and not self.right_camera_greyscale:
             return
 
-        # Convert QPixmap objects to OpenCV-compatible numpy arrays
-        img1 = qimage_to_np(pixmap1.toImage())
-        img2 = qimage_to_np(pixmap2.toImage())
+        if self.left_camera_running:
+            self.left_camera.frame_received.disconnect()
+            self.left_camera.frame_received.connect(self.update_left_camera_feed_colour)
 
-        # Create an OpenCV window
-        if cv2.getWindowProperty("Image Processing", cv2.WND_PROP_VISIBLE) < 1:
-            cv2.namedWindow("Image Processing", cv2.WINDOW_NORMAL)
-            cv2.resizeWindow("Image Processing", 960, 540)
+        if self.right_camera_running:
+            self.right_camera.frame_received.disconnect()
+            self.right_camera.frame_received.connect(self.update_right_camera_feed_colour)
 
-        # Create trackbars for brightness, contrast, and noise reduction adjustments
-        cv2.createTrackbar("Brightness-Cam-1", "Image Processing", 0, 100, lambda x: None)
-        cv2.createTrackbar("Contrast-Cam-1", "Image Processing", 0, 100, lambda x: None)
-        cv2.createTrackbar("Denoise-Cam-1", "Image Processing", 0, 100, lambda x: None)
-        cv2.createTrackbar("Brightness-Cam-2", "Image Processing", 0, 100, lambda x: None)
-        cv2.createTrackbar("Contrast-Cam-2", "Image Processing", 0, 100, lambda x: None)
-        cv2.createTrackbar("Denoise-Cam-2", "Image Processing", 0, 100, lambda x: None)
+        self.left_camera_greyscale = False
+        self.right_camera_greyscale = False
 
-        def apply_clahe(img, clip_limit=2.0, tile_grid_size=(8, 8)):
-            clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
-            if len(img.shape) == 3:
-                lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-                l, a, b = cv2.split(lab)
-                cl = clahe.apply(l)
-                limg = cv2.merge((cl, a, b))
-                return cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
-            else:
-                return clahe.apply(img)
+    @pyqtSlot()
+    def update_camera_feed_greyscale(self):
+        if self.left_camera_greyscale and self.right_camera_greyscale:
+            return
 
-        def adjust_gamma(img, gamma=1.0):
-            inv_gamma = 1.0 / gamma
-            table = np.array([((i / 255.0) ** inv_gamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
-            return cv2.LUT(img, table)
+        if self.left_camera_running:
+            self.left_camera.frame_received.disconnect()
+            self.left_camera.frame_received.connect(self.update_left_camera_feed)
 
-        while True:
-            # Retrieve the trackbar values
-            gamma1 = cv2.getTrackbarPos("Brightness-Cam-1", "Image Processing") / 100
-            clahe1 = cv2.getTrackbarPos("Contrast-Cam-1", "Image Processing") / 100
-            denoise1 = cv2.getTrackbarPos("Denoise-Cam-1", "Image Processing")
-            gamma2 = cv2.getTrackbarPos("Brightness-Cam-2", "Image Processing") / 100
-            clahe2 = cv2.getTrackbarPos("Contrast-Cam-2", "Image Processing") / 100
-            denoise2 = cv2.getTrackbarPos("Denoise-Cam-2", "Image Processing")
+        if self.right_camera_running:
+            self.right_camera.frame_received.disconnect()
+            self.right_camera.frame_received.connect(self.update_right_camera_feed)
 
-            # Apply brightness, contrast, and noise reduction adjustments
-            adjusted_img1 = apply_clahe(img1, clip_limit=clahe1)
-            adjusted_img1 = adjust_gamma(adjusted_img1, gamma=gamma1)
-            adjusted_img1 = cv2.fastNlMeansDenoisingColored(adjusted_img1, None, denoise1, denoise1, 7, 21)
-
-            adjusted_img2 = apply_clahe(img2, clip_limit=clahe2)
-            adjusted_img2 = adjust_gamma(adjusted_img2, gamma=gamma2)
-            adjusted_img2 = cv2.fastNlMeansDenoisingColored(adjusted_img2, None, denoise2, denoise2, 7, 21)
-
-            # Display the adjusted images side by side
-            adjusted_side_by_side_image = np.hstack((adjusted_img1, adjusted_img2))
-            cv2.imshow("Image Processing", adjusted_side_by_side_image)
-
-            # Wait for user interactions
-            key = cv2.waitKey(1) & 0xFF
-
-            if key == ord("q"):
-                # User pressed "q" to quit the loop
-                break
-            elif key == ord("b"):
-                # User pressed "b" to blend the images
-                blend_ratio = 0.5  # Adjust this value to change the blending ratio
-                blended_image = cv2.addWeighted(adjusted_img1, blend_ratio, adjusted_img2, 1 - blend_ratio, 0)
-                cv2.imshow("Blended Image", blended_image)
-
-        # Close the OpenCV window
-        cv2.destroyWindow("Image Processing")
-        cv2.waitKey(1)
-    
-    def close_image_processing_window(self):
-        cv2.destroyAllWindows()
-        cv2.waitKey(1)
-
+        self.left_camera_greyscale = True
+        self.right_camera_greyscale = True
+ 
 #CSI Camera Class
 class CSI_Camera(QObject):
     frame_received = pyqtSignal(QImage)
@@ -263,7 +232,6 @@ class CSI_Camera(QObject):
             self.read_thread.start()
         elif self.video_capture is None:
             print("Camera not initialized. Call 'reinitialize()' with the appropriate pipeline string before starting.")
-
 
     @pyqtSlot()
     def stop(self):
@@ -314,3 +282,4 @@ if __name__ == "__main__":
     modern_window = ModernWindow(window)
     modern_window.show()
     sys.exit(app.exec_())
+
