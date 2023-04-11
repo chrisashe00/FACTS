@@ -21,6 +21,16 @@ def np_to_qimage(arr: np.ndarray) -> QImage:
     # Properly handling the data type of the numpy array
     return QImage(arr.astype(np.uint8).data, arr.shape[1], arr.shape[0], arr.strides[0], QImage.Format_RGB888)
 
+def draw_scale_bar(image, pixels_per_unit, bar_length_units, bar_thickness, position, color=(255, 255, 255), label=True, font_scale=1):
+    bar_length_pixels = int(bar_length_units * pixels_per_unit)
+    x, y = position
+    cv2.rectangle(image, (x, y), (x + bar_length_pixels, y - bar_thickness), color, -1)
+    if label:
+        text = f"{bar_length_units} units"
+        (text_width, text_height), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, 1)
+        cv2.putText(image, text, (x + (bar_length_pixels - text_width) // 2, y - bar_thickness - 10), cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA)
+
+
 #GUI Window Class
 class MyWindow(QMainWindow):
     def __init__(self):
@@ -86,6 +96,11 @@ class MyWindow(QMainWindow):
         np_image = qimage_to_np(qimage)
         np_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2GRAY)
         np_image = cv2.cvtColor(np_image, cv2.COLOR_GRAY2BGR)
+        
+        # Add scale bar to the image
+        pixels_per_unit = 0.0000606060606061  # This should be replaced with the actual conversion factor
+        draw_scale_bar(np_image, pixels_per_unit, 50, 5, (50, 500))
+
         qimage = np_to_qimage(np_image)
         pixmap = QPixmap.fromImage(qimage)
         self.camfeed1.setPixmap(pixmap)
@@ -95,6 +110,11 @@ class MyWindow(QMainWindow):
         np_image = qimage_to_np(qimage)
         np_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2GRAY)
         np_image = cv2.cvtColor(np_image, cv2.COLOR_GRAY2BGR)
+        
+        # Add scale bar to the image
+        pixels_per_unit = 0.0000606060606061  # This should be replaced with the actual conversion factor
+        draw_scale_bar(np_image, pixels_per_unit, 50, 5, (50, 500))
+
         qimage = np_to_qimage(np_image)
         pixmap = QPixmap.fromImage(qimage)
         self.camfeed2.setPixmap(pixmap)
@@ -184,7 +204,7 @@ class MyWindow(QMainWindow):
 
         self.left_camera_greyscale = True
         self.right_camera_greyscale = True
- 
+    
 #CSI Camera Class
 class CSI_Camera(QObject):
     frame_received = pyqtSignal(QImage)
