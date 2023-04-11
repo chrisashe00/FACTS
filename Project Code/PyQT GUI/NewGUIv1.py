@@ -27,7 +27,7 @@ def draw_scale_bar(image, pixels_per_unit, bar_length_units, bar_thickness, posi
     cv2.rectangle(image, (x, y), (x + bar_length_pixels, y - bar_thickness), color, -1)
     if label:
         micrometers = int(bar_length_units * 10)  # Convert units to micrometers
-        text = f"{micrometers} µm"
+        text = f"{micrometers} um"
         (text_width, text_height), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, 1)
         cv2.putText(image, text, (x + (bar_length_pixels - text_width) // 2, y - bar_thickness - 10), cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA)
 
@@ -68,6 +68,7 @@ class MyWindow(QMainWindow):
             self.left_camera.stop()
             self.left_camera.release()
             self.camfeed1.setPixmap(QPixmap())
+            self.left_camera.frame_received.disconnect()
             self.left_camera_running = False
 
     def start_left_camera(self):
@@ -89,6 +90,7 @@ class MyWindow(QMainWindow):
             self.right_camera.stop()
             self.right_camera.release()
             self.camfeed2.setPixmap(QPixmap())
+            self.right_camera.frame_received.disconnect()
             self.right_camera_running = False
 
     @pyqtSlot(QImage)
@@ -123,8 +125,11 @@ class MyWindow(QMainWindow):
     def capture_left_camera_image(self):
         grabbed, frame = self.left_camera.read()
         if grabbed:
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+            if self.left_camera_greyscale:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+            pixels_per_unit = 165  # This is now in pixels per 1 mm
+            draw_scale_bar(frame, pixels_per_unit, 2 , 5, (50, 500))
             qimage = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format_RGB888).rgbSwapped()
             pixmap = QPixmap.fromImage(qimage)
             self.imgcam1.setPixmap(pixmap)
@@ -141,8 +146,11 @@ class MyWindow(QMainWindow):
     def capture_right_camera_image(self):
         grabbed, frame = self.right_camera.read()
         if grabbed:
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+            if self.right_camera_greyscale:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+            pixels_per_unit = 165  # This is now in pixels per 1 mm
+            draw_scale_bar(frame, pixels_per_unit, 2 , 5, (50, 500))
             qimage = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format_RGB888).rgbSwapped()
             pixmap = QPixmap.fromImage(qimage)
             self.imgcam2.setPixmap(pixmap)
@@ -165,11 +173,19 @@ class MyWindow(QMainWindow):
 
     @pyqtSlot(QImage)
     def update_left_camera_feed_colour(self, qimage):
+        np_image = qimage_to_np(qimage)
+        pixels_per_unit = 165  # This is now in pixels per 1 mm
+        draw_scale_bar(np_image, pixels_per_unit, 2 , 5, (50, 500))
+        qimage = np_to_qimage(np_image)
         pixmap = QPixmap.fromImage(qimage)
         self.camfeed1.setPixmap(pixmap)
 
     @pyqtSlot(QImage)
     def update_right_camera_feed_colour(self, qimage):
+        np_image = qimage_to_np(qimage)
+        pixels_per_unit = 165  # This is now in pixels per 1 mm
+        draw_scale_bar(np_image, pixels_per_unit, 2 , 5, (50, 500))
+        qimage = np_to_qimage(np_image)
         pixmap = QPixmap.fromImage(qimage)
         self.camfeed2.setPixmap(pixmap)
     
@@ -246,9 +262,10 @@ class CSI_Camera(QObject):
             return None
         if self.video_capture is not None:
             self.running = True
-            self.read_thread = QThread()
-            self.moveToThread(self.read_thread)
-            self.read_thread.started.connect(self.updateCamera)
+            if self.read_thread is None or not self.read_thread.isRunning():
+                self.read_thread = QThread()
+                self.moveToThread(self.read_thread)
+                self.read_thread.started.connect(self.updateCamera)
             self.read_thread.start()
         elif self.video_capture is None:
             print("Camera not initialized. Call 'reinitialize()' with the appropriate pipeline string before starting.")
