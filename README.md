@@ -19,27 +19,27 @@ This folder contains all the code required to run the Graphical User Interface o
 
 With the Repository cloned locally on your machine you can follow these steps to run the GUI on any machine.
 
-1 Open the terminal in your IDE (we recommend VS code) or on your device
+1. Open the terminal in your IDE (we recommend VS code) or on your device
 
-2 Change Directory ('cd') to where the FACTS folder is located from your clone, your file path should end in 
+2. Change Directory ('cd') to where the FACTS folder is located from your clone, your file path should end in 
 
 ```
 folder_1\folder_2\FACTS
 ```
 
-3 You will need to make a virtual environment to run the code, create a virtual environment to run the GUI code with this command
+3. You will need to make a virtual environment to run the code, create a virtual environment to run the GUI code with this command
 
 ```
 virtualenv GUI\env  
 ```
 
-4 Activate the new virtual envrionment 
+4. Activate the new virtual envrionment 
 
 ```
 GUI\env\Scripts\activate 
 ```
 
-5 now install the required libraries to run the GUIs using:
+5. Now install the required libraries to run the GUIs using:
 
 ```
 pip install -r GUI\requirements.txt
@@ -49,7 +49,7 @@ pip install -r GUI\requirements.txt
 *Now you may run either the camera vision GUI or Image Processing GUI*
 
 
-7 To run camera vision GUI (will not have any camera vision if not on JETSON NANO) use the command:
+7. To run camera vision GUI (will not have any camera vision if not on JETSON NANO) use the command:
 
 ```
 python GUI\TS_CV.py
@@ -73,6 +73,3 @@ find out how to add platformIO to your project here: https://platformio.org/inst
 
 
 Once PlatformIO is added to this project, you need to install the relevant header .h libraries using the PlatformIO home screen. Then you can compile and upload this code to an ESP32 and control your microscope!
-
-
-
