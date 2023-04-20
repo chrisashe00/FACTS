@@ -57,7 +57,7 @@ pip install -r GUI\requirements.txt
 python GUI\TS_CV.py
 ```
 
-8 To run the imge processing GUI use: 
+8. To run the imge processing GUI use: 
 
 ```
 python GUI\TS_IP.py
