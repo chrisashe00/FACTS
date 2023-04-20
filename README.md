@@ -11,6 +11,8 @@ Before proceeding it should be known that the software code was implemented in a
 
 This repository is divided into three main folders: GUI, Autofocus and Electronics.
 
+Any Issues please raise an issue in the above 'issues' tab or email: *chris.ashe.2018@uni.strath.ac.uk*
+
 # GUI
 
 This folder contains all the code required to run the Graphical User Interface on the NVIDIA Jetson Nano. if you just want to see how the GUI looks and inspect the code you can also run the code but there will be no camera functionality. Here are the steps to run either of the
@@ -24,7 +26,7 @@ With the Repository cloned locally on your machine you can follow these steps to
 2. Change Directory ('cd') to where the FACTS folder is located from your clone, your file path should end in 
 
 ```
-folder_1\folder_2\FACTS
+...\FACTS
 ```
 
 3. You will need to make a virtual environment to run the code, create a virtual environment to run the GUI code with this command
