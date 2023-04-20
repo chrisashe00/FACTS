@@ -12,7 +12,11 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
+<<<<<<< HEAD:Autofocus/.vscode/launch.json
             "executable": "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/build/esp32dev/firmware.elf",
+=======
+            "executable": "C:/Users/talha/Desktop/FACTS/.pio/build/esp32dev/firmware.elf",
+>>>>>>> df5a1fa35c449f3bc42dea5225d1c8bed77b8777:.vscode/launch.json
             "projectEnvName": "esp32dev",
             "toolchainBinDir": "C:/Users/vchri/.platformio/packages/toolchain-xtensa-esp32/bin",
             "internalConsoleOptions": "openOnSessionStart",
@@ -25,7 +29,11 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
+<<<<<<< HEAD:Autofocus/.vscode/launch.json
             "executable": "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/build/esp32dev/firmware.elf",
+=======
+            "executable": "C:/Users/talha/Desktop/FACTS/.pio/build/esp32dev/firmware.elf",
+>>>>>>> df5a1fa35c449f3bc42dea5225d1c8bed77b8777:.vscode/launch.json
             "projectEnvName": "esp32dev",
             "toolchainBinDir": "C:/Users/vchri/.platformio/packages/toolchain-xtensa-esp32/bin",
             "internalConsoleOptions": "openOnSessionStart"
@@ -34,7 +42,11 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
+<<<<<<< HEAD:Autofocus/.vscode/launch.json
             "executable": "c:/Users/vchri/OneDrive - University of Strathclyde/Documents/5th Year/Goup Project/FACTS/FACTS/.pio/build/esp32dev/firmware.elf",
+=======
+            "executable": "C:/Users/talha/Desktop/FACTS/.pio/build/esp32dev/firmware.elf",
+>>>>>>> df5a1fa35c449f3bc42dea5225d1c8bed77b8777:.vscode/launch.json
             "projectEnvName": "esp32dev",
             "toolchainBinDir": "C:/Users/vchri/.platformio/packages/toolchain-xtensa-esp32/bin",
             "internalConsoleOptions": "openOnSessionStart",
