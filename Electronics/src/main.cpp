@@ -1,3 +1,7 @@
+// Code Written by Christopher Ashe in Academic year 2022/2023 for MENG Project
+// University of Strathclyde
+// These headers must be included, you can find them on the platformIO home
+
 #include <Arduino.h>
 #include <Stepper.h>
 #include <Ps3Controller.h>
