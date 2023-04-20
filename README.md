@@ -5,7 +5,7 @@ This Github Repo contains all the code used to control the Microscopy Imaging Pl
 
 
 This Repo contains the three key components involved in controlling the microscope through electronics and Graphical User Interfaces (GUI). This project has constructed MIP based on the design methodology of the open source microscopy 
-platform UC2 ('You See Too') (LINK: http://useetoo.org), if you have not constructed a speicific microscope setup and just want to see how some of this code works we have outlined some of the requirements just to make the important files run smoothly!
+platform UC2 ('You See Too') (LINK: http://useetoo.org), if you have not constructed a specific microscope setup and just want to see how some of this code works we have outlined some of the requirements just to make the important files run smoothly!
 
 Before proceeding it should be known that the software code was implemented in a Jetson Nano and therefore the GUI and Autofocus algortithms will only run to an extent before requiring a Raspberry Pi dual camera feed. 
 
