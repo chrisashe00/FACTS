@@ -1,4 +1,4 @@
-# Welcome to MIP!
+# Welcome to MIP SOFTWARE!
 
 ## What is in this Repository? 
 This Github Repo contains all the code used to control the Microscopy Imaging Platform (MIP) that was created during this project. This Code can be built upon to control similar microscopy platforms of various imaging modalities.
@@ -63,7 +63,16 @@ python GUI\TS_IP.py
 
 # Autofocus 
 
-The autofocus code uses serial communication between an NVIDIA Jetson Nano and ESP32 to control a stepper motor based on the autofocus commands
+The autofocus code uses serial communication between an NVIDIA Jetson Nano and ESP32 to control a stepper motor based on the autofocus commands, there's not much you can do with this code without a jetson nano and a esp32 and stepper motor, please read our report for more details on our build process and how each sub system interacts to replicate the autofocus routine!
+
+# Electronics Control
+
+The electronics folder includes a number of files however the important one is simply main.cpp. Open the electronics folder in VS code and install the platformIO plugin. You can use platformIO to compile and upload the code to an ESP32. Like autofocus, there is not much you can do with this code without the respective electronics hardware *(build specified in report)* and system but this code could be applied to a number of different microscope setups so please apply it wherever you need in your project!
+
+find out how to add platformIO to your project here: https://platformio.org/install (install PlatformIO for VSCode)
+
+
+Once PlatformIO is added to this project, you need to install the relevant header .h libraries using the PlatformIO home screen. Then you can compile and upload this code to an ESP32 and control your microscope!
 
 
 
