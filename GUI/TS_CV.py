@@ -35,7 +35,7 @@ def draw_scale_bar(image, pixels_per_unit, bar_length_units, bar_thickness, posi
 class MyWindow(QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
-        loadUi('nuiv4.ui', self)
+        loadUi('GUI/nuiv4.ui', self)
         self.show()
 
         # Connect buttons to their respective functions

@@ -11,7 +11,7 @@ from PyQt5.QtGui import QImage, QPixmap
 class MyWindow(QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
-        loadUi('final_ip_gui.ui', self)
+        loadUi('GUI\TS_IP.ui', self)
         self.img1.setScaledContents(True)
         self.img2.setScaledContents(True)
         self.original_image1 = None
