@@ -11,11 +11,11 @@ Before proceeding it should be known that the software code was implemented in a
 
 This repository is divided into three main folders: GUI, Autofocus and Electronics.
 
-Any Issues please raise an issue in the above 'issues' tab or email: *chris.ashe.2018@uni.strath.ac.uk*
+Any Issues please raise an issue in the above 'issues' tab or email: *chrisashe60@gmail.com*
 
 # GUI
 
-This folder contains all the code required to run the Graphical User Interface on the NVIDIA Jetson Nano. if you just want to see how the GUI looks and inspect the code you can also run the code but there will be no camera functionality. Here are the steps to run either of the
+This folder contains all the code required to run the Graphical User Interface on the NVIDIA Jetson Nano. if you just want to see how the GUI looks and inspect the code you can also run the code but there will be no camera functionality. Here are the steps to run either of the GUIs
 
 ## How To Setup and use the GUI
 
@@ -74,4 +74,4 @@ The electronics folder includes a number of files however the important one is s
 find out how to add platformIO to your project here: https://platformio.org/install (install PlatformIO for VSCode)
 
 
-Once PlatformIO is added to this project, you need to install the relevant header .h libraries using the PlatformIO home screen. Then you can compile and upload this code to an ESP32 and control your microscope!
+Once PlatformIO is installed and added to this project, you need to install the relevant header .h libraries using the PlatformIO home screen. the **main.cpp** file is the file that contains all the code that controls the electrinics of the microscope Then you can compile and upload this code to an ESP32 and control your microscope!
